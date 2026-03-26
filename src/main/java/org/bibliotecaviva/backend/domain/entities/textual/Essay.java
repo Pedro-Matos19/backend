@@ -9,7 +9,6 @@ import org.bibliotecaviva.backend.domain.entities.TextualWork;
 /*
 * Redação nota 10
 */
-
 public class Essay extends TextualWork {
     private Integer rate;
     private String theme;
