@@ -1,15 +1,16 @@
 package org.bibliotecaviva.backend.aplication.dtos.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@RequiredArgsConstructor
+@SuperBuilder
+@Getter
+@ToString
+@NoArgsConstructor
 @AllArgsConstructor
-@Data
 public class WorkResponseDTO {
     private UUID id;
     private String title;
