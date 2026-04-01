@@ -1,10 +1,10 @@
 package org.bibliotecaviva.backend.infrastructure.web.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.bibliotecaviva.backend.application.dto.LoginRequestDTO;
-import org.bibliotecaviva.backend.application.dto.LoginResponseDTO;
-import org.bibliotecaviva.backend.application.dto.RegisterRequestDTO;
-import org.bibliotecaviva.backend.domain.enums.Role;
+
+import org.bibliotecaviva.backend.application.dtos.request.LoginRequestDTO;
+import org.bibliotecaviva.backend.application.dtos.request.RegisterRequestDTO;
+import org.bibliotecaviva.backend.application.dtos.response.LoginResponseDTO;
 import org.bibliotecaviva.backend.infrastructure.persistance.repository.UserRepository;
 import org.bibliotecaviva.backend.domain.entities.user.User;
 import org.bibliotecaviva.backend.infrastructure.security.JwtService;
@@ -41,8 +41,8 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<LoginResponseDTO> register(@RequestBody RegisterRequestDTO request) {
-        if (request.role() == Role.VISITANTE) {
-            return ResponseEntity.badRequest().build();
+        if (userRepository.findByEmail(request.email()).isPresent()) {
+            return ResponseEntity.status(409).build();
         }
 
         User user = User.builder()
