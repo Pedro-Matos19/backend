@@ -19,7 +19,4 @@ import java.time.Duration;
 @AllArgsConstructor
 public abstract class  VisualWork extends Work {
     private String url;
-    @Convert(converter = DurationConverter.class)
-    private Duration duration;
-
 }

@@ -21,7 +21,7 @@ public abstract class Work {
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     private String title;
-    //pósteriormente o usuario
+    //TODO: relacionamento com usuario
     private String author;
     private LocalDateTime publicationDate;
     @Column(columnDefinition = "TEXT")
