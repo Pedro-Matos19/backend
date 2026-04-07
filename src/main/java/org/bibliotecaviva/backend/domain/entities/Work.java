@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -26,7 +27,8 @@ public abstract class Work {
     private LocalDateTime publicationDate;
     @Column(columnDefinition = "TEXT")
     private String description;
-
+    private Long viewCount = 0L;
+    private Long likes = 0L;
     public String getType() {
         return this.getClass().getAnnotation(DiscriminatorValue.class) != null
                 ? this.getClass().getAnnotation(DiscriminatorValue.class).value()

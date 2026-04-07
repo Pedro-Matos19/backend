@@ -5,8 +5,13 @@ info:
 
 http:
   method: GET
-  url: "{{api_url}}work/11111111-1111-1111-1111-111111111001"
+  url: "{{api_url}}work/33333333-3333-3333-3333-333333333001"
   auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: bru.setGlobalEnvVar("work_id", res.getBody().id)
 
 settings:
   encodeUrl: true

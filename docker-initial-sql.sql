@@ -32,6 +32,8 @@ CREATE TABLE public.obras
     publication_date timestamp(6) NULL,
     title            varchar(255) NULL,
     users_id         uuid         NULL,
+    likes int8 NOT NULL DEFAULT 0,
+    view_count int8 NOT NULL DEFAULT 0,
     CONSTRAINT obras_pkey PRIMARY KEY (id),
     CONSTRAINT obras_type_check CHECK (((type)::text = ANY
                                         ((ARRAY ['LibraLiterature'::character varying, 'Multimedia'::character varying, 'Article'::character varying, 'Cordel'::character varying, 'Essay'::character varying, 'ShortStory'::character varying, 'Tale'::character varying, 'Art'::character varying, 'Infographic'::character varying])::text[]))),

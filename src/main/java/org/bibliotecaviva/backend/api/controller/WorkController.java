@@ -39,6 +39,12 @@ public class WorkController {
         return ResponseEntity.ok(service.getById(id));
     }
 
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likeWork(@PathVariable UUID id) {
+        service.like(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         service.delete(id);

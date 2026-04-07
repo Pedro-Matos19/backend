@@ -15,4 +15,6 @@ public interface WorkSummary {
     LocalDateTime getPublicationDate();
     String getDescription();
     String getType();
+    Long getViewCount();
+    Long getLikes();
 }

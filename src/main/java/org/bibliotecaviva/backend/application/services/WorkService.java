@@ -48,13 +48,18 @@ public class WorkService {
                 .toList();
     }
 
+    //todo: resolver os 1 milhao de join, mandar o tipo na req ou pegar sla
     public WorkResponse getById(UUID id) {
         var work = workRepository.findById(id)
                 .orElseThrow(() -> new WorkNotFoundException("Obra com id " + id + " não encontrada"));
-        //todo: view count
+        //todo: cachear dps se ficar pesado, principalmente os likes pra evitar ficar mandando varias requisicoes
+        workRepository.incrementViewCount(id);
         return workMapper.toDTO(work);
     }
-
+    //todo: mapear por user com tabela entre os 2 pra fazer o toggle, por enqt so incrementa pra visualiacsacao
+    public void like(UUID id) {
+        workRepository.incrementLikes(id);
+    }
     @Transactional
     public void delete(UUID id) {
         workRepository.findById(id)
@@ -82,7 +87,8 @@ public class WorkService {
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         };
         work.setAuthor(author);
-
+        work.setLikes(0L);
+        work.setViewCount(0L);
         //todo: pode verificar por tipo tambem, ver isso dps
         if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
             throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
