@@ -12,6 +12,8 @@ public record ArtResponseDTO(
         LocalDateTime publicationDate,
         String description,
         String type,
-        String url
+        String url,
+        Long viewCount,
+        Long likes
 ) implements WorkResponse {
 }

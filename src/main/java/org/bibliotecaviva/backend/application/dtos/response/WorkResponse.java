@@ -6,7 +6,6 @@ import org.bibliotecaviva.backend.application.dtos.response.audiovisual.Multimed
 import org.bibliotecaviva.backend.application.dtos.response.textual.*;
 import org.bibliotecaviva.backend.application.dtos.response.visual.ArtResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.visual.InfographicReponseDTO;
-import org.bibliotecaviva.backend.domain.entities.User;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -25,6 +24,7 @@ public interface WorkResponse {
     String author();
     LocalDateTime publicationDate();
     String description();
-    //view count
-    //likes
+
+    Long viewCount();
+    Long likes();
 }

@@ -12,6 +12,8 @@ public record ArticleResponseDTO(
         LocalDateTime publicationDate,
         String description,
         String type,
-        String content
+        String content,
+        Long viewCount,
+        Long likes
 ) implements WorkResponse {
 }

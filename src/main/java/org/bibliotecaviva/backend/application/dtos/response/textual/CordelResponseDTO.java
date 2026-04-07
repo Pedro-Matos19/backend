@@ -13,6 +13,8 @@ public record CordelResponseDTO(
         String description,
         String type,
         String content,
-        String rhymeScheme
+        String rhymeScheme,
+        Long viewCount,
+        Long likes
 ) implements WorkResponse {
 }

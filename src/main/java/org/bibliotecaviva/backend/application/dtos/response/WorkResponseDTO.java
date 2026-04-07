@@ -12,7 +12,9 @@ public record WorkResponseDTO(
         String author,
         LocalDateTime publicationDate,
         String description,
-        String type
+        String type,
+        Long viewCount,
+        Long likes
 ) implements WorkResponse {
 }
 

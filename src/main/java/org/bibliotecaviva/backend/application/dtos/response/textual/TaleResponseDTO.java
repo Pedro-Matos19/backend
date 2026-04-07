@@ -13,6 +13,8 @@ public record TaleResponseDTO(
         String description,
         String type,
         String content,
-        String genre
+        String genre,
+        Long viewCount,
+        Long likes
 ) implements WorkResponse {
 }
