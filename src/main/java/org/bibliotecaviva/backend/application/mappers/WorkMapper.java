@@ -30,18 +30,17 @@ public interface WorkMapper {
         return toWorkSummary(summary);
     }
 
-    @Mapping(target = "likeCount", source = "likeCount")
-    default WorkResponse toDTO(Work work, Long likeCount) {
+    default WorkResponse toDTO(Work work, Long likeCount,Long commentCount) {
         return switch (work) {
-            case LibraLiterature w -> toLibraLiteratureResponseDTO(w, likeCount);
-            case Multimedia w -> toMultimediaResponseDTO(w, likeCount);
-            case Article w -> toArticleResponseDTO(w, likeCount);
-            case Cordel w -> toCordelResponseDTO(w, likeCount);
-            case Essay w -> toEssayResponseDTO(w, likeCount);
-            case ShortStory w -> toShortStoryResponseDTO(w, likeCount);
-            case Tale w -> toTaleResponseDTO(w, likeCount);
-            case Art w -> toArtResponseDTO(w, likeCount);
-            case Infographic w -> toInfographicReponseDTO(w, likeCount);
+            case LibraLiterature w -> toLibraLiteratureResponseDTO(w, likeCount,commentCount);
+            case Multimedia w -> toMultimediaResponseDTO(w, likeCount,commentCount);
+            case Article w -> toArticleResponseDTO(w, likeCount,commentCount);
+            case Cordel w -> toCordelResponseDTO(w, likeCount,commentCount);
+            case Essay w -> toEssayResponseDTO(w, likeCount,commentCount);
+            case ShortStory w -> toShortStoryResponseDTO(w, likeCount,commentCount);
+            case Tale w -> toTaleResponseDTO(w, likeCount,commentCount);
+            case Art w -> toArtResponseDTO(w, likeCount,commentCount);
+            case Infographic w -> toInfographicReponseDTO(w, likeCount,commentCount);
             default -> throw new IllegalStateException("Unexpected value: " + work);
         };
     }
@@ -54,23 +53,23 @@ public interface WorkMapper {
     WorkResponseDTO toWorkSummary(WorkSummary work);
 
     // mapeamentos específicos de cada entidade
-    LibraLiteratureResponseDTO toLibraLiteratureResponseDTO(LibraLiterature libraLiterature, Long likeCount);
+    LibraLiteratureResponseDTO toLibraLiteratureResponseDTO(LibraLiterature libraLiterature, Long likeCount,Long commentCount);
 
-    MultimediaResponseDTO toMultimediaResponseDTO(Multimedia Multimedia, Long likeCount);
+    MultimediaResponseDTO toMultimediaResponseDTO(Multimedia Multimedia, Long likeCount,Long commentCount);
 
-    ArticleResponseDTO toArticleResponseDTO(Article article, Long likeCount);
+    ArticleResponseDTO toArticleResponseDTO(Article article, Long likeCount,Long commentCount);
 
-    CordelResponseDTO toCordelResponseDTO(Cordel cordel, Long likeCount);
+    CordelResponseDTO toCordelResponseDTO(Cordel cordel, Long likeCount,Long commentCount);
 
-    EssayResponseDTO toEssayResponseDTO(Essay essay, Long likeCount);
+    EssayResponseDTO toEssayResponseDTO(Essay essay, Long likeCount,Long commentCount);
 
-    ShortStoryResponseDTO toShortStoryResponseDTO(ShortStory shortStory, Long likeCount);
+    ShortStoryResponseDTO toShortStoryResponseDTO(ShortStory shortStory, Long likeCount,Long commentCount);
 
-    TaleResponseDTO toTaleResponseDTO(Tale tale, Long likeCount);
+    TaleResponseDTO toTaleResponseDTO(Tale tale, Long likeCount,Long commentCount);
 
-    ArtResponseDTO toArtResponseDTO(Art art, Long likeCount);
+    ArtResponseDTO toArtResponseDTO(Art art, Long likeCount,Long commentCount);
 
-    InfographicReponseDTO toInfographicReponseDTO(Infographic infographic, Long likeCount);
+    InfographicReponseDTO toInfographicReponseDTO(Infographic infographic, Long likeCount,Long commentCount);
 
     // daqui pra baixo separar ppor classe do mapper se prcisar, ver depois
     @Mapping(target = "author", ignore = true)

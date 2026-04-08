@@ -32,4 +32,6 @@ public interface WorkResponse {
     Long viewCount();
 
     Long likeCount();
+
+    Long commentCount();
 }

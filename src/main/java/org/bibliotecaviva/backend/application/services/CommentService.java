@@ -20,6 +20,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final WorkRepository workRepository;
 
+    //todo (?):  impedir comntario duplicado ou limitar  2 ou 3 igual pra impedir spam?
+    // ver se é necessário, n precisa fzer agora
     @Transactional
     public CommentResponseDTO create(UUID workId, String content, User user) {
         var work = workRepository.findById(workId)
@@ -44,7 +46,7 @@ public class CommentService {
                 .map(this::toDTO)
                 .toList();
     }
-
+    //todo: permitir editar o proprio comentario
     @Transactional
     public CommentResponseDTO update(UUID commentId, String content) {
         Comment comment = commentRepository.findById(commentId)
@@ -52,7 +54,7 @@ public class CommentService {
         comment.setContent(content);
         return toDTO(commentRepository.save(comment));
     }
-
+    //todo: permitir deletar o proprio comentario
     @Transactional
     public void delete(UUID commentId) {
         if (!commentRepository.existsById(commentId)) {

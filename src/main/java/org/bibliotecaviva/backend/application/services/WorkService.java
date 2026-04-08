@@ -21,6 +21,7 @@ import org.bibliotecaviva.backend.domain.entities.visual.Infographic;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkAlreadyExistsException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
+import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
 import org.bibliotecaviva.backend.persistance.repository.UserRepository;
 import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final WorkMapper workMapper;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     /**
      * Puxa todos da tabela works usando uma interface com atributos específicos
@@ -55,7 +57,7 @@ public class WorkService {
         var work = workRepository.findById(id)
                 .orElseThrow(() -> new WorkNotFoundException("Obra com id " + id + " não encontrada"));
         workRepository.incrementViewCount(id);
-        return workMapper.toDTO(work, workRepository.getLikeCount(id));
+        return workMapper.toDTO(work, workRepository.getLikeCount(id),commentRepository.countByWork_Id(id));
     }
 
     //TODO: cachear se necessario ou fazer um sistema de like mais complexo pra evitar ficar dando update toda hor
@@ -108,7 +110,7 @@ public class WorkService {
         if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
             throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
         }
-        return workMapper.toDTO(workRepository.save(work), 0L);
+        return workMapper.toDTO(workRepository.save(work), 0L,0L);
     }
 
     public <T extends WorkRequest> WorkResponse update(UUID id, T dto) {
@@ -133,6 +135,6 @@ public class WorkService {
                     .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.author()));
             work.setAuthor(user);
         }
-        return workMapper.toDTO(workRepository.save(work), workRepository.getLikeCount(id));
+        return workMapper.toDTO(workRepository.save(work), workRepository.getLikeCount(id), commentRepository.countByWork_Id(id));
     }
 }

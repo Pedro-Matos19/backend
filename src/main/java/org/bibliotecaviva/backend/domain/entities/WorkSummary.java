@@ -21,4 +21,6 @@ public interface WorkSummary {
     Long getViewCount();
 
     Long getLikeCount();
+
+    Long getCommentCount();
 }
