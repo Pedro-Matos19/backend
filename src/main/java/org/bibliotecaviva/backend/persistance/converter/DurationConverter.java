@@ -2,10 +2,11 @@ package org.bibliotecaviva.backend.persistance.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
+
 import java.time.Duration;
 
-/*
-* Classe que converte automáticamente coluna que é um long no banco para duração(utilizado nas entidades).
+/**
+ * Classe que converte automáticamente coluna que é um long no banco para duração(utilizado nas entidades).
  */
 @Converter(autoApply = false)
 public class DurationConverter implements AttributeConverter<Duration, Long> {

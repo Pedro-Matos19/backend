@@ -24,13 +24,13 @@ public class UserManagementService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    /** @param id
-    * Acepts any status, since blocked and rejected can change to approved(active status)
+    /**
+     * @param id Acepts any status, since blocked and rejected can change to approved(active status)
      */
     @Transactional
     public void activateUser(UUID id) {
         var user = getUser(id);
-        if (user.getAccountStatus() == Status.ACTIVE){
+        if (user.getAccountStatus() == Status.ACTIVE) {
             throw new AccountAlreadyActiveException("User with id: " + id + " is already active");
         }
         user.setAccountStatus(Status.ACTIVE);
@@ -38,8 +38,7 @@ public class UserManagementService {
     }
 
     /**
-     * @param id
-     * Only accepts pending users, rejected can be changed to approved.
+     * @param id Only accepts pending users, rejected can be changed to approved.
      */
     @Transactional
     public void rejectUser(UUID id) {
@@ -53,13 +52,12 @@ public class UserManagementService {
     }
 
     /**
-     * @param id
-     * Accepts any status, c
+     * @param id Accepts any status, c
      */
     @Transactional
     public void blockUser(UUID id) {
         var user = getUser(id);
-        if(user.getAccountStatus() == Status.BLOCKED){
+        if (user.getAccountStatus() == Status.BLOCKED) {
             throw new AccountAlreadyBlockedException("User with id: " + id + " is already blocked");
         }
         user.setAccountStatus(Status.BLOCKED);

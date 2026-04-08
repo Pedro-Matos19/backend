@@ -14,6 +14,6 @@ import org.bibliotecaviva.backend.domain.entities.Work;
 @NoArgsConstructor
 @SuperBuilder
 @AllArgsConstructor
-public abstract class  VisualWork extends Work {
+public abstract class VisualWork extends Work {
     private String url;
 }

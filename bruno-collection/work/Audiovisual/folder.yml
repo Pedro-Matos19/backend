@@ -1,7 +1,7 @@
 info:
-  name: Visual
+  name: Audiovisual
   type: folder
-  seq: 6
+  seq: 2
 
 request:
   auth: inherit

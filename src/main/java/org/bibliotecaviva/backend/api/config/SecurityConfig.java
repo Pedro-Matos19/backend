@@ -28,6 +28,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    //todo: colocar coisas do cors e jwt no env
 
     private final JwtAuthFilter jwtAuthFilter;
     private final UserDetailsService userDetailsService;
@@ -37,7 +38,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/login","/auth/register", "/swagger-ui/**", "/scalar/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register", "/swagger-ui/**", "/scalar/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/work/**").permitAll() //hasAnyRole("ADMIN", "CURADOR", "ALUNO")
                         .requestMatchers(HttpMethod.POST, "/work/{id}/like").authenticated()
                         .requestMatchers(HttpMethod.POST, "/work/*/comments").hasAnyRole("ALUNO", "CURADOR")
@@ -79,7 +80,6 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        //todo: mudar no deploy colocar .env
         config.setAllowedOrigins(List.of("http://localhost:5173"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));

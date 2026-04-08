@@ -1,6 +1,5 @@
 package org.bibliotecaviva.backend.application.dtos.response.audiovisual;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
 
 import java.time.LocalDateTime;
@@ -15,6 +14,8 @@ public record LibraLiteratureResponseDTO(
         String type,
         String url,
         Long viewCount,
-        Long likeCount
+        Long likeCount,
+        Long commentCount
+
 ) implements WorkResponse {
 }

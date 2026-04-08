@@ -1,7 +1,6 @@
 package org.bibliotecaviva.backend.application.services;
 
 import lombok.RequiredArgsConstructor;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

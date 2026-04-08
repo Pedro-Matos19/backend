@@ -25,13 +25,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccountStatusException.class)
     public ResponseEntity<ApiErrorResponse> handleAccountStatusException(AccountStatusException ex, HttpServletRequest request) {
-        String message = switch (ex){
+        String message = switch (ex) {
             case LockedException e -> "Conta bloqueada, contatar administrador";
             case DisabledException e -> "Conta ainda nao foi ativada";
             default -> ex.getMessage();
         };
         return build(HttpStatus.FORBIDDEN, message, request);
     }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> handleMethodArgumentNotValidException(
             MethodArgumentNotValidException ex,
@@ -39,15 +40,13 @@ public class GlobalExceptionHandler {
         List<ApiErrorResponse.FieldError> fields = ex.getBindingResult().getFieldErrors().stream()
                 .map(e -> new ApiErrorResponse.FieldError(e.getField(), e.getDefaultMessage()))
                 .toList();
-        ApiErrorResponse error = ApiErrorResponse.of(HttpStatus.BAD_REQUEST, "Invalid Fields", request.getRequestURI(), fields);
+        ApiErrorResponse error = ApiErrorResponse.of(HttpStatus.BAD_REQUEST, "Campos invalidos", request.getRequestURI(), fields);
         return ResponseEntity.badRequest().body(error);
     }
 
-    //Todo: Implement exceptions handlers for specific exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleAllExceptions(Exception ex) {
-        // Return a generic error response
-        return ResponseEntity.status(500).body("An unexpected error occurred: " + ex.getMessage());
+        return ResponseEntity.status(500).body("An unexpected error occurred: " + "Erro inesperado");
     }
 
     private ResponseEntity<ApiErrorResponse> build(HttpStatus status, String message, HttpServletRequest request) {

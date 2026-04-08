@@ -14,7 +14,8 @@ public record WorkResponseDTO(
         String description,
         String type,
         Long viewCount,
-        Long likeCount
+        Long likeCount,
+        Long commentCount
 ) implements WorkResponse {
 }
 

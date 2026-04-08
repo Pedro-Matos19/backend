@@ -10,7 +10,7 @@ import lombok.experimental.SuperBuilder;
 import org.bibliotecaviva.backend.domain.entities.Work;
 
 /*
-* contos cordeis e cronicas
+ * contos cordeis e cronicas
  */
 @MappedSuperclass
 @Getter

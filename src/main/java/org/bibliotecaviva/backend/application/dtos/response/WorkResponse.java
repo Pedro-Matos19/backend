@@ -10,8 +10,8 @@ import org.bibliotecaviva.backend.application.dtos.response.visual.InfographicRe
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/*
- * interface marcadora
+/**
+ * marker interface for all works responses
  */
 @Schema(name = "WorkResponse", description = "Interface for all work response DTOs", oneOf =
         {WorkResponseDTO.class, LibraLiteratureResponseDTO.class, MultimediaResponseDTO.class, ArticleResponseDTO.class,
@@ -20,10 +20,18 @@ import java.util.UUID;
 )
 public interface WorkResponse {
     UUID id();
+
     String title();
+
     String author();
+
     LocalDateTime publicationDate();
+
     String description();
+
     Long viewCount();
+
     Long likeCount();
+
+    Long commentCount();
 }

@@ -43,7 +43,7 @@ public class WorkController {
 
     @PostMapping("/{id}/like")
     public ResponseEntity<String> likeWork(@PathVariable UUID id,
-                           @AuthenticationPrincipal User user) {
+                                           @AuthenticationPrincipal User user) {
 
         return ResponseEntity.ok(service.like(id, user));
     }

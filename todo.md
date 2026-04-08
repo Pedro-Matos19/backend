@@ -2,6 +2,8 @@ todo
 -
 
 - [ ] Colocar paginação
+- [ ] RefreshToken e Logout
+- [ ] 
 - [ ] Clube de leitura organizado por professores
     - Divulgação do livro do mês
     - adesão dos participantes
