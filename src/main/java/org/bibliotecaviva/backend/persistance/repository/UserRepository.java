@@ -1,11 +1,13 @@
 package org.bibliotecaviva.backend.persistance.repository;
 
 import org.bibliotecaviva.backend.domain.entities.User;
+import org.bibliotecaviva.backend.domain.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -23,4 +25,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Modifying
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND work_id = :workId", nativeQuery = true)
     void unlikeWork(@Param("userId") UUID userId, @Param("workId") UUID workId);
+
+    List<User> findAllByAccountStatus(Status accountStatus);
 }

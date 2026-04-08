@@ -27,7 +27,7 @@ import java.util.UUID;
 @RequestMapping("/work")
 @RequiredArgsConstructor
 public class WorkController {
-    //TODO: PATCH FOR PARTIAL UPDATES IF NEEDED
+    //TODO: PATCH FOR PARTIAL UPDATES IF NEEDED, soft delete com status nas obras
     private final WorkService service;
 
     @GetMapping

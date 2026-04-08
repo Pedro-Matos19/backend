@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bibliotecaviva.backend.domain.enums.Role;
+import org.bibliotecaviva.backend.domain.enums.Status;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,7 +33,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
+    @Enumerated(EnumType.STRING)
+    private Status accountStatus;
     @ManyToMany //create Like class if timestamp or other atributes needed
     @JoinTable(
             name = "likes",
@@ -59,6 +61,10 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
+
+        if (accountStatus == Status.BLOCKED) {
+            return false;
+        }
         return true;
     }
 
@@ -69,6 +75,9 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
+        if (accountStatus == Status.PENDING || accountStatus == Status.REJECTED) {
+            return false;
+        }
         return true;
     }
 }
