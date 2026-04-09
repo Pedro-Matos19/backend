@@ -192,7 +192,7 @@ VALUES ('e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf', 'aluno1@teste.com', 'aluno1', '$
        ('eca64533-6dbd-465b-863c-bb540fecdc61', 'aluno2@teste.com', 'aluno2', '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ALUNO', 'ACTIVE'),
        ('4c9f354b-0780-4cdb-b76f-d43e54ea3644', 'aluno3@teste.com', 'aluno3', '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ALUNO', 'ACTIVE'),
        ('455150bd-8e40-498c-8005-cca9cefa9099', 'professor@teste.com', 'professor', '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'CURADOR', 'ACTIVE'),
-       ('febc5d09-cc12-4bc0-b29c-2cde56102619', 'admin@admin.com', 'admin', '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ADMIN', 'ACTIVE');
+       ('febc5d09-cc12-4bc0-b29c-2cde56102619', 'admin@teste.com', 'admin', '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ADMIN', 'ACTIVE');
 
 -- ========================================================
 -- Aluno 1: e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf

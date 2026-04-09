@@ -51,7 +51,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/work/**").hasAnyRole("ADMIN", "CURADOR")
                         .requestMatchers(HttpMethod.GET, "/work/**").permitAll() //hasAnyRole("ADMIN", "CURADOR", "ALUNO")
 
-                        .requestMatchers("/auth/login", "/auth/register","/auth/logout  ", "/swagger-ui/**", "/scalar/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/auth/login", "/auth/register","/auth/logout", "/swagger-ui/**", "/scalar/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
