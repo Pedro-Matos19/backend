@@ -28,15 +28,16 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
-    //todo: pageable
     // registrar conta de professor / trocar role pra prof
 
     @GetMapping()
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponse(responseCode = "200",description = "OK")
     @ApiResponse(responseCode = "400",description = "Invalid status value.")
-    public ResponseEntity<List<UserResponseDTO>> getAllUsers(@RequestParam(required = false) Status status) {
-        return ResponseEntity.ok(userManagementService.getAllUsers(status));
+    public ResponseEntity<Page<UserResponseDTO>> getAllUsers(
+            @RequestParam(required = false) Status status,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(userManagementService.getAllUsers(status, pageable));
     }
 
     @PatchMapping("/approve/{id}")

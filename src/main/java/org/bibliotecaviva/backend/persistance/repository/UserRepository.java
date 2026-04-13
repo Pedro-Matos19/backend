@@ -28,7 +28,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND work_id = :workId", nativeQuery = true)
     void unlikeWork(@Param("userId") UUID userId, @Param("workId") UUID workId);
 
-    List<User> findAllByAccountStatus(Status accountStatus);
+    Page<User> findAllByAccountStatus(Status accountStatus, Pageable pageable);
 
     boolean existsByEmail(String email);
 }

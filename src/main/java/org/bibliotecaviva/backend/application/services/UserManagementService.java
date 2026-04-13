@@ -66,14 +66,12 @@ public class UserManagementService {
     }
 
     //trocar por dto
-    public List<UserResponseDTO> getAllUsers(Status status) {
-        if(status != null){
-            return userRepository.findAllByAccountStatus(status)
-                    .stream()
-                    .map(userMapper::toDto)
-                    .toList();
+    public Page<UserResponseDTO> getAllUsers(Status status, Pageable pageable) {
+        if (status != null) {
+            return userRepository.findAllByAccountStatus(status, pageable)
+                    .map(userMapper::toDto);
         }
-        return userRepository.findAll().stream().map(userMapper::toDto).toList();
+        return userRepository.findAll(pageable).map(userMapper::toDto);
     }
 
     private @NonNull User getUser(UUID id) {

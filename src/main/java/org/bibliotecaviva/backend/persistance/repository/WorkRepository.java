@@ -36,8 +36,13 @@ public interface WorkRepository extends JpaRepository<Work, UUID> {
                 GROUP BY work_id
             ) cm ON cm.work_id = w.id
             WHERE (:type IS NULL OR w.type = :type)
-            """, nativeQuery = true)
-    List<WorkSummary> findAllSummary(@Param("type") String type);
+            """,
+            countQuery = """
+            SELECT COUNT(*) FROM obras w
+            WHERE (:type IS NULL OR w.type = :type)
+            """,
+            nativeQuery = true)
+    Page<WorkSummary> findAllSummary(@Param("type") String type, Pageable pageable);
 
     @Modifying
     @Transactional

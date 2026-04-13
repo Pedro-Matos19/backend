@@ -2,7 +2,7 @@ package org.bibliotecaviva.backend.api.controller;
 
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.tags.Tags;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.request.CommentRequestDTO;
@@ -48,8 +48,10 @@ public class CommentController {
     @GetMapping
     @ApiResponse(responseCode = "200", description = "Comments retrieved successfully")
     @ApiResponse(responseCode = "404", description = "Work not found")
-    public ResponseEntity<List<CommentResponseDTO>> getByWorkId(@PathVariable UUID workId) {
-        return ResponseEntity.ok(commentService.getByWorkId(workId));
+    public ResponseEntity<Page<CommentResponseDTO>> getByWorkId(
+            @PathVariable UUID workId,
+            @PageableDefault(size = 10) Pageable pageable) {
+        return ResponseEntity.ok(commentService.getByWorkId(workId, pageable));
     }
 
     @PutMapping("/{commentId}")
