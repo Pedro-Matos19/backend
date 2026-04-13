@@ -5,7 +5,11 @@ info:
 
 http:
   method: GET
-  url: "{{api_url}}admin"
+  url: "{{api_url}}admin?status="
+  params:
+    - name: status
+      value: ""
+      type: query
   auth: inherit
 
 settings:

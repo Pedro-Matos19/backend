@@ -1,5 +1,6 @@
 package org.bibliotecaviva.backend.application.services;
 
+import jakarta.persistence.EnumType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -9,7 +10,9 @@ import org.bibliotecaviva.backend.application.dtos.request.audiovisual.Multimedi
 import org.bibliotecaviva.backend.application.dtos.request.textual.*;
 import org.bibliotecaviva.backend.application.dtos.request.visual.ArtRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.visual.InfographicRequestDTO;
+import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
+import org.bibliotecaviva.backend.application.dtos.response.WorkSummaryResponseDTO;
 import org.bibliotecaviva.backend.application.mappers.WorkMapper;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.entities.Work;
@@ -18,9 +21,11 @@ import org.bibliotecaviva.backend.domain.entities.audiovisual.Multimedia;
 import org.bibliotecaviva.backend.domain.entities.textual.*;
 import org.bibliotecaviva.backend.domain.entities.visual.Art;
 import org.bibliotecaviva.backend.domain.entities.visual.Infographic;
+import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkAlreadyExistsException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
+import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
 import org.bibliotecaviva.backend.persistance.repository.UserRepository;
 import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
 import org.springframework.data.domain.Page;
@@ -38,48 +43,27 @@ public class WorkService {
     private final WorkRepository workRepository;
     private final WorkMapper workMapper;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
-    /*
-     * Puxa todos da tabela works usando uma interface com atributos específicos
-     * para nao requisitar tudo do banco
+    /**
+     * Puxa direto da tabela works usando uma interface com atributos genericos
+     * para evitar fazer joins desnecessários
      */
-    public Page<WorkResponse> getAll(String type, Pageable pageable) {
-        return workRepository.findAllSummary(type, pageable)
-                .map(workMapper::toWorkDTO);
+    public List<WorkSummaryResponseDTO> getAll(WorkTypes type) {
+        String types =type==null? null: WorkTypes.fromString(type.name()).getValue();
+        return workRepository.findAllSummary(types)
+                .stream()
+                .map(workMapper::toWorkSummary)
+                .toList();
     }
 
-    //todo: resolver os 1 milhao de join, mandar o tipo na req ou pegar sla cachear dps se ficar pesado,
-    // pra evitar ficar fazendo update toda hr no banco pras views
+    //todo: - verificar view count (vai dar gargalo ficar fazendo update assim)
+    //      - da pra melhorar a performace pq ta fazendo o join com todas as tabelas desnecessariamente
     public WorkResponse getById(UUID id) {
         var work = workRepository.findById(id)
                 .orElseThrow(() -> new WorkNotFoundException("Obra com id " + id + " não encontrada"));
         workRepository.incrementViewCount(id);
-        return workMapper.toDTO(work, workRepository.getLikeCount(id));
-    }
-
-    //TODO: cachear se necessario ou fazer um sistema de like mais complexo pra evitar ficar dando update toda hor
-    // string por enquanto somente pra debug, dps void
-    @Transactional
-    public String like(UUID workId, User user) {
-        workRepository.findById(workId)
-                .orElseThrow(() -> new WorkNotFoundException("Obra com id " + workId + " não encontrada"));
-        var userId = user.getId();
-        var liked = false;
-        if (userRepository.existsLike(userId, workId)) {
-            userRepository.unlikeWork(userId, workId);
-        } else {
-            userRepository.likeWork(userId, workId);
-            liked = true;
-        }
-
-        return String.format("Obra com id %s: %s com sucesso",workId, liked ? "curtida" : "descurtida");
-    }
-
-    @Transactional
-    public void delete(UUID id) {
-        workRepository.findById(id)
-                .orElseThrow(() -> new WorkNotFoundException("Obra não encontrada"));
-        workRepository.deleteById(id);
+        return workMapper.toDTO(work, workRepository.getLikeCount(id),commentRepository.countByWork_Id(id));
     }
 
     @Transactional
@@ -107,9 +91,10 @@ public class WorkService {
         if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
             throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
         }
-        return workMapper.toDTO(workRepository.save(work), 0L);
+        return workMapper.toDTO(workRepository.save(work), 0L,0L);
     }
 
+    @Transactional
     public <T extends WorkRequest> WorkResponse update(UUID id, T dto) {
         Work work = workRepository.findById(id)
                 .orElseThrow(() -> new WorkNotFoundException("Obra não encontrada"));
@@ -132,6 +117,32 @@ public class WorkService {
                     .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.author()));
             work.setAuthor(user);
         }
-        return workMapper.toDTO(workRepository.save(work), workRepository.getLikeCount(id));
+        //todo: verificar update, provvavelmente pode quebrar regra de author e nome de obra
+        return workMapper.toDTO(workRepository.save(work), workRepository.getLikeCount(id), commentRepository.countByWork_Id(id));
     }
+
+    @Transactional
+    public void delete(UUID id) {
+        workRepository.findById(id)
+                .orElseThrow(() -> new WorkNotFoundException("Obra com id " + id + " não encontrada"));
+        workRepository.deleteById(id);
+    }
+
+    //TODO: fazer sistema melhor de like ou colocar um limitador de request ou cachear ( mesmo problema das views)
+    // pode dar gargalo fazer update toda hora assim
+    @Transactional
+    public LikeResponseDTO like(UUID workId, User user) {
+        workRepository.findById(workId)
+                .orElseThrow(() -> new WorkNotFoundException("Obra com id " + workId + " não encontrada"));
+        var userId = user.getId();
+        var liked = false;
+        if (userRepository.existsLike(userId, workId)) {
+            userRepository.unlikeWork(userId, workId);
+        } else {
+            userRepository.likeWork(userId, workId);
+            liked = true;
+        }
+        return new LikeResponseDTO("Obra " + (liked ? "curtida" : "descurtida"),workRepository.getLikeCount(workId));
+    }
+
 }

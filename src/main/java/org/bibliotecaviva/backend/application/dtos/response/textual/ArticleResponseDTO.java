@@ -14,6 +14,7 @@ public record ArticleResponseDTO(
         String type,
         String content,
         Long viewCount,
-        Long likeCount
+        Long likeCount,
+        Long commentCount
 ) implements WorkResponse {
 }

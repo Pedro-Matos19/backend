@@ -5,16 +5,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
-/*
- * usado so pra sinaliazr que os outros sao subtipos
+/**
+ * marker interface for all work requests
  */
 @Schema(hidden = true)
 public interface WorkRequest {
     //Todo: Colocar verificações de dominio das urls posteriormente
     String title();
-    String author(); // ver comoo vai mandar isso no front tbm, por enqunato ta mandando email
+
+    String author(); //por enqunato ta mandando email, trocar dps por matricula/cpf
+
     LocalDateTime publicationDate();
+
     String description();
-    //view count
-    //likes
 }

@@ -7,11 +7,20 @@ import java.util.UUID;
 // somente resumo das obras( usado somente em workrepository)
 public interface WorkSummary {
     UUID getId();
+
     String getTitle();
+
     String getAuthor();
+
     LocalDateTime getPublicationDate();
+
     String getDescription();
+
     String getType();
+
     Long getViewCount();
+
     Long getLikeCount();
+
+    Long getCommentCount();
 }

@@ -1,62 +1,53 @@
 package org.bibliotecaviva.backend.api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-
 import org.bibliotecaviva.backend.application.dtos.request.LoginRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.RegisterRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.response.LoginResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.RegisterResponseDTO;
-import org.bibliotecaviva.backend.domain.enums.Role;
-import org.bibliotecaviva.backend.domain.enums.Status;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
-import org.bibliotecaviva.backend.domain.entities.User;
-import org.bibliotecaviva.backend.application.services.JwtService;
+import org.bibliotecaviva.backend.application.services.AuthService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(
+        name = "Authentication",
+        description = "Controller responsible for handling authentication-related operations such as login, registration, and logout."
+)
 public class AuthController {
-
-    //TODO: remover logica de serviço direto no controller
-    private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+    //mudar se tiver usando cookies no front
+    private final AuthService authService;
 
     @PostMapping("/login")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "401", description = "Credenciais Inválidas",content = @Content)
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequestDTO request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.email(), request.password())
-        );
-        User user = (User) userDetailsService.loadUserByUsername(request.email());
-        String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new LoginResponseDTO(token, user.getEmail()));
+        return ResponseEntity.ok(authService.login(request));
     }
 
     @PostMapping("/register")
+    @ApiResponse(responseCode = "201", description = "Created")
+    @ApiResponse(responseCode = "403", description = "Conflict, email already exists",content = @Content)
     public ResponseEntity<RegisterResponseDTO> register(@RequestBody RegisterRequestDTO request) {
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            return ResponseEntity.status(409).build();
+        return new ResponseEntity<>(authService.register(request), HttpStatus.CREATED);
+    }
+
+    @ApiResponse(responseCode = "401", description = "No token to remove or invalid token.",content = @Content)
+    @Operation(description = "Add token to blacklist, remove after expire")
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+            authService.invalidateToken(token);
         }
-        User user = User.builder()
-                .name(request.name())
-                .email(request.email())
-                .password(passwordEncoder.encode(request.password()))
-                .role(Role.ALUNO)
-                .accountStatus(Status.PENDING)
-                .build();
-        userRepository.save(user);
-        return ResponseEntity.ok(new RegisterResponseDTO(user.getName(), user.getEmail(),
-                "Pedido gerado com sucesso, aguarde a aprovação do administrador."));
+        return ResponseEntity.noContent().build();
     }
 }

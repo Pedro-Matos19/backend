@@ -25,13 +25,13 @@ public class UserManagementService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    /** @param id
-    * Acepts any status, since blocked and rejected can change to approved(active status)
+    /**
+     * @param id Acepts any status, since blocked and rejected can change to approved(active status)
      */
     @Transactional
     public void activateUser(UUID id) {
         var user = getUser(id);
-        if (user.getAccountStatus() == Status.ACTIVE){
+        if (user.getAccountStatus() == Status.ACTIVE) {
             throw new AccountAlreadyActiveException("User with id: " + id + " is already active");
         }
         user.setAccountStatus(Status.ACTIVE);
@@ -39,8 +39,7 @@ public class UserManagementService {
     }
 
     /**
-     * @param id
-     * Only accepts pending users, rejected can be changed to approved.
+     * @param id Only accepts pending users, rejected can be changed to approved.
      */
     @Transactional
     public void rejectUser(UUID id) {
@@ -54,13 +53,12 @@ public class UserManagementService {
     }
 
     /**
-     * @param id
-     * Accepts any status, c
+     * @param id Accepts any status, c
      */
     @Transactional
     public void blockUser(UUID id) {
         var user = getUser(id);
-        if(user.getAccountStatus() == Status.BLOCKED){
+        if (user.getAccountStatus() == Status.BLOCKED) {
             throw new AccountAlreadyBlockedException("User with id: " + id + " is already blocked");
         }
         user.setAccountStatus(Status.BLOCKED);
@@ -68,13 +66,14 @@ public class UserManagementService {
     }
 
     //trocar por dto
-    public Page<UserResponseDTO> getAllUsers(Pageable pageable) {
-        return userRepository.findAll(pageable).map(userMapper::toDto);
-    }
-
-    public Page<UserResponseDTO> getUsersByStatus(Status status, Pageable pageable) {
-        return userRepository.findAllByAccountStatus(status, pageable)
-                .map(userMapper::toDto);
+    public List<UserResponseDTO> getAllUsers(Status status) {
+        if(status != null){
+            return userRepository.findAllByAccountStatus(status)
+                    .stream()
+                    .map(userMapper::toDto)
+                    .toList();
+        }
+        return userRepository.findAll().stream().map(userMapper::toDto).toList();
     }
 
     private @NonNull User getUser(UUID id) {
