@@ -59,17 +59,18 @@ public class CommentController {
     @ApiResponse(responseCode = "400", description = "Invalid request body")
     @ApiResponse(responseCode = "404", description = "Comment not found")
     public ResponseEntity<CommentResponseDTO> update(
-          //  @PathVariable UUID workId, comentei pq n tav usando
             @PathVariable UUID commentId,
-            @RequestBody @Valid CommentRequestDTO dto) {
-        return ResponseEntity.ok(commentService.update(commentId, dto.content()));
+            @RequestBody @Valid CommentRequestDTO dto,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(commentService.update(commentId, user.getId(), dto.content()));
     }
 
     @DeleteMapping("/{commentId}")
     @ApiResponse(responseCode = "204", description = "Comment deleted")
     @ApiResponse(responseCode = "404", description = "Comment not found")
-    public ResponseEntity<Void> delete(@PathVariable UUID commentId) {
-        commentService.delete(commentId);
+    public ResponseEntity<Void> delete(@PathVariable UUID commentId,
+                                       @AuthenticationPrincipal User user) {
+        commentService.delete(commentId, user);
         return ResponseEntity.noContent().build();
     }
 }
