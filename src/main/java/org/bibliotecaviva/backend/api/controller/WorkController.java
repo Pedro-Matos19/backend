@@ -14,6 +14,7 @@ import org.bibliotecaviva.backend.application.dtos.request.audiovisual.Multimedi
 import org.bibliotecaviva.backend.application.dtos.request.textual.*;
 import org.bibliotecaviva.backend.application.dtos.request.visual.ArtRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.visual.InfographicRequestDTO;
+import org.bibliotecaviva.backend.application.dtos.response.HomePageDashboardResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
 import org.bibliotecaviva.backend.application.dtos.response.WorkSummaryResponseDTO;
@@ -28,6 +29,7 @@ import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.ApiErrorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +63,7 @@ public class WorkController {
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid Parameter")
     public ResponseEntity<Page<WorkSummaryResponseDTO>> getAll(
             @RequestParam(required = false) WorkTypes type,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 10,sort ="publication_date",direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(service.getAll(type, pageable));
     }
 
@@ -71,6 +73,11 @@ public class WorkController {
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(service.getById(id));
+    }
+
+    @GetMapping("/home")
+    public ResponseEntity<HomePageDashboardResponseDTO> getFrontPageData(){
+        return ResponseEntity.ok(service.getFrontPageData());
     }
 
 

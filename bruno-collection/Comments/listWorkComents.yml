@@ -1,12 +1,11 @@
 info:
-  name: approveUser
+  name: listWorkComents
   type: http
-  seq: 4
+  seq: 2
 
 http:
-  method: PATCH
-  url: "{{api_url}}admin/approve/{{id}}"
-  auth: inherit
+  method: GET
+  url: "{{api_url}}work/{{work_id}}/comments"
 
 settings:
   encodeUrl: true

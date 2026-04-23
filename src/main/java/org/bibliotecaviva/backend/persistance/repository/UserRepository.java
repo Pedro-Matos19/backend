@@ -31,4 +31,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Page<User> findAllByAccountStatus(Status accountStatus, Pageable pageable);
 
     boolean existsByEmail(String email);
+
+    Long countUserByAccountStatus(Status accountStatus);
 }

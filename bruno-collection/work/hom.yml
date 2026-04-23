@@ -1,11 +1,11 @@
 info:
-  name: approveUser
+  name: hom
   type: http
-  seq: 4
+  seq: 9
 
 http:
-  method: PATCH
-  url: "{{api_url}}admin/approve/{{id}}"
+  method: GET
+  url: "{{api_url}}work/home"
   auth: inherit
 
 settings:
