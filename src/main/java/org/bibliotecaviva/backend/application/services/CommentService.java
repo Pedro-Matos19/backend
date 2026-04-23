@@ -49,6 +49,10 @@ public class CommentService {
                 .map(this::toDTO);
     }
 
+    public Page<CommentResponseDTO> getAll(Pageable pageable){
+        return commentRepository.findAll(pageable)
+                .map(this::toDTO);
+    }
     @Transactional
     public CommentResponseDTO update(UUID commentId, UUID userId, String content) {
         Comment comment = commentRepository.findById(commentId)

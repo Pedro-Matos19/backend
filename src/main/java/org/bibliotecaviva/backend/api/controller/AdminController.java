@@ -3,7 +3,9 @@ package org.bibliotecaviva.backend.api.controller;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.UserResponseDTO;
+import org.bibliotecaviva.backend.application.services.CommentService;
 import org.bibliotecaviva.backend.application.services.UserManagementService;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.springframework.data.domain.Page;
@@ -19,14 +21,15 @@ import java.util.UUID;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 @Tag(
-        name = "User Management",
-        description = "Controller responsible for handling user management operations such as retrieving user information," +
+        name = "Admin Management",
+        description = "Controller responsible for handling admin operations such as retrieving user information," +
                 " activating, rejecting, and blocking users. " +
                 "Only accessible by administrators."
 )
-public class UserManagementController {
+public class AdminController {
 
     private final UserManagementService userManagementService;
+    private final CommentService commentService;
 
     // registrar conta de professor / trocar role pra prof
 
@@ -68,6 +71,13 @@ public class UserManagementController {
     public ResponseEntity<Void> blockUser(@PathVariable UUID id) {
         userManagementService.blockUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/comments")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiResponse(responseCode = "200", description = "Comments retrieved successfully")
+    public ResponseEntity<Page<CommentResponseDTO>> getAllComments(@PageableDefault() Pageable pageable) {
+        return ResponseEntity.ok(commentService.getAll(pageable));
     }
 
 }
