@@ -168,4 +168,7 @@ public class WorkService {
                 works
         );
     }
+    public Long countWorks(){
+        return workRepository.count();
+    }
 }

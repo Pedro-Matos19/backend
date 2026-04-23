@@ -2,7 +2,9 @@ package org.bibliotecaviva.backend.application.services;
 
 import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Comment;
+import org.bibliotecaviva.backend.domain.entities.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.exceptions.CommentNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
@@ -49,9 +51,9 @@ public class CommentService {
                 .map(this::toDTO);
     }
 
-    public Page<CommentResponseDTO> getAll(Pageable pageable){
-        return commentRepository.findAll(pageable)
-                .map(this::toDTO);
+    public Page<CommentSummaryResponseDTO> getAll(Pageable pageable){
+        return commentRepository.findAllWithUserAndWork(pageable)
+                .map(this::toSummaryDTO);
     }
     @Transactional
     public CommentResponseDTO update(UUID commentId, UUID userId, String content) {
@@ -88,6 +90,21 @@ public class CommentService {
                 comment.getContent(),
                 comment.getUser().getName(),
                 comment.getCreatedAt()
+              //  comment.getWork().getTitle()
         );
+    }
+
+    private CommentSummaryResponseDTO toSummaryDTO(CommentSummary coment){
+        return new CommentSummaryResponseDTO(
+                coment.getId(),
+                coment.getContent(),
+                coment.getUserName(),
+                coment.getWorkTitle(),
+                coment.getCreatedAt()
+        );
+    }
+
+    public Long countComments(){
+        return commentRepository.count();
     }
 }

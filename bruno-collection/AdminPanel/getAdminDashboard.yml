@@ -1,11 +1,11 @@
 info:
-  name: approveUser
+  name: getAdminDashboard
   type: http
-  seq: 4
+  seq: 3
 
 http:
-  method: PATCH
-  url: "{{api_url}}admin/approve/{{id}}"
+  method: GET
+  url: "{{api_url}}admin/dashboard"
   auth: inherit
 
 settings:

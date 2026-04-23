@@ -79,4 +79,10 @@ public class UserManagementService {
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
     }
 
+    public Long countUsers() {
+        return userRepository.count();
+    }
+    public Long countPendingUsers() {
+        return userRepository.countUserByAccountStatus(Status.PENDING);
+    }
 }

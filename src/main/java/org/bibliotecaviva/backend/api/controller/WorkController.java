@@ -29,6 +29,7 @@ import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.ApiErrorResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,7 +63,7 @@ public class WorkController {
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid Parameter")
     public ResponseEntity<Page<WorkSummaryResponseDTO>> getAll(
             @RequestParam(required = false) WorkTypes type,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PageableDefault(size = 10,sort ="publication_date",direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(service.getAll(type, pageable));
     }
 
