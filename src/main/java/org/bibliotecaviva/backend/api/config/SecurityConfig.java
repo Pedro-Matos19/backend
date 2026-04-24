@@ -52,7 +52,9 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "CURADOR", "ALUNO")
 
                         .requestMatchers(HttpMethod.POST, "/work/*/comments").hasAnyRole("ALUNO", "CURADOR", "ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/work/*/like").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/work/liked").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/work/*/like").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/work/*/like").authenticated()
 
                         .requestMatchers(HttpMethod.POST, "/work/**").hasAnyRole("ADMIN", "CURADOR")
                         .requestMatchers(HttpMethod.PUT, "/work/**").hasAnyRole("ADMIN", "CURADOR")

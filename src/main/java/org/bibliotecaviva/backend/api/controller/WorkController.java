@@ -34,6 +34,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -82,13 +83,28 @@ public class WorkController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/like")
-    @ApiResponse(responseCode = "200", content = @Content, description = "Liked or disliked")
+    @GetMapping("/liked")
+    @ApiResponse(responseCode = "200")
+    public ResponseEntity<List<UUID>> getLikedWorkIds(@AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(service.getLikedWorkIds(user));
+    }
+
+    @PutMapping("/{id}/like")
+    @ApiResponse(responseCode = "200", content = @Content, description = "Liked")
     @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<LikeResponseDTO> likeWork(@PathVariable UUID id,
             @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(service.like(id, user));
+    }
+
+    @DeleteMapping("/{id}/like")
+    @ApiResponse(responseCode = "200", content = @Content, description = "UnLiked")
+    @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
+    @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
+    public ResponseEntity<LikeResponseDTO> unLike(@PathVariable UUID id,
+            @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(service.unLike(id, user));
     }
 
     @PostMapping("/articles")
