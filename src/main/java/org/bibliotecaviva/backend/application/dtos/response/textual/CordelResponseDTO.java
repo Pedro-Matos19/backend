@@ -17,6 +17,8 @@ public record CordelResponseDTO(
         Long viewCount,
         Long likeCount,
         Long commentCount,
-        String url
+        String url,
+        String studentClass
+
 ) implements WorkResponse {
 }

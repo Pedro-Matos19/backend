@@ -1,0 +1,27 @@
+info:
+  name: create Review
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{api_url}}bookclub/{{bookclub_id}}/comments"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "MUDOU MINHA VIDA.",
+        "rating": 5
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: bookclub_id
+      value: 33333333-3333-3333-3333-333333333003
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

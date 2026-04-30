@@ -18,8 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.temporal.TemporalAdjusters;
 import java.util.UUID;
 
 @Service
@@ -31,26 +34,34 @@ public class BookClubService {
 
     @Transactional
     public BookClubResponseDTO create(BookClubRequestDTO requestDTO, User user) {
-        var bookClub = bookClubMapper.toEntity(requestDTO,user);
-        return bookClubMapper.toDto(bookClubRepository.save(bookClub), 0L);
+        var bookClub = bookClubMapper.toEntity(requestDTO, user);
+        var subMonth =  requestDTO.date().toLocalDate();
+        LocalDateTime mothStart = subMonth.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime monthEnd = subMonth.with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
+        if (bookClubRepository.existsBookClubByDateBetween(mothStart, monthEnd)) {
+            throw new ConflictException("Já existe um clube do livro agendado para este mês");
+        }
+        return bookClubMapper.toDto(bookClubRepository.save(bookClub), 0L,BigDecimal.ZERO);
     }
 
     public BookClubResponseDTO getNext() {
         var next = bookClubRepository.findFirstByDateAfterOrderByDateAsc(LocalDateTime.now())
                 .orElseThrow(() -> new NotFoundException("Nenhum clube do livro pra exibir"));
-        return bookClubMapper.toDto(next, bookClubRepository.countParticipants(next.getId()));
+        return bookClubMapper.toDto(next, bookClubRepository.countParticipants(next.getId()),bookClubRepository.getAverageRating(next.getId()));
     }
 
     public Page<BookClubResponseDTO> getAll(Pageable pageable) {
-        return bookClubRepository.findAllWithParticipantCount(pageable)
-                .map(club -> bookClubMapper.toDto((BookClub) club[0], (Long) club[1])
+        var teste = bookClubRepository.findAllWithParticipantCountAndAverageRating(pageable);
+        System.out.println(teste);
+        return bookClubRepository.findAllWithParticipantCountAndAverageRating(pageable)
+                .map(club -> bookClubMapper.toDto((BookClub) club[0], (Long) club[1],BigDecimal.valueOf((Double) club[2]).setScale(2, RoundingMode.HALF_UP))
                 );
 
     }
 
     public BookClubResponseDTO getById(UUID id) {
         var work = bookClubRepository.findById(id).orElseThrow(() -> new NotFoundException("CLUBE de leitura nao encontrado"));
-        return bookClubMapper.toDto(work, bookClubRepository.countParticipants(id));
+        return bookClubMapper.toDto(work, bookClubRepository.countParticipants(id),bookClubRepository.getAverageRating(id)); //todo: pegar numa query só
     }
 
     @Transactional
@@ -66,20 +77,27 @@ public class BookClubService {
         var bookClub = bookClubRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Clube do livro com id " + id + " não encontrado"));
         verifyOwnership(user, bookClub);
+        //ver se podi
+        var subMonth =  requestDTO.date().toLocalDate();
+        LocalDateTime mothStart = subMonth.withDayOfMonth(1).atStartOfDay();
+        LocalDateTime monthEnd = subMonth.with(TemporalAdjusters.lastDayOfMonth()).atTime(23, 59, 59);
+        if (bookClubRepository.existsBookClubByDateBetweenAndIdNot(mothStart, monthEnd,id)) {
+            throw new ConflictException("Já existe um clube do livro agendado para este mês");
+        }
         bookClubMapper.partialUpdate(requestDTO, bookClub);
-        return bookClubMapper.toDto(bookClub, bookClubRepository.countParticipants(id));
+        return bookClubMapper.toDto(bookClub, bookClubRepository.countParticipants(id),bookClubRepository.getAverageRating(id));
     }
 
     @Transactional
     public SubscribeResponseDTO subscribe(UUID id, User user) {
         //todo: adicionar capacidade maxima se precisar,pode variar de acordocom o local, caso seja somente presencial da
-        //      pra fzer uns enums e mapear corretamete, por enquanto ta capado em 100 hardcoded
+        //      pra fzer uns enums e mapear corretamete, por enquanto ta capado em 25 hardcoded
         var bookClub = bookClubRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Clube do livro com id " + id + " não encontrado"));
         if (bookClub.getParticipants().contains(user)) {
             throw new ConflictException("Usuário já inscrito");
         }
-        if (bookClub.getParticipants().size() >= 100) {
+        if (bookClub.getParticipants().size() >= 25) {
             throw new ConflictException("Limite de participantes atingido");
         }
         bookClub.getParticipants().add(user);

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Comment;
-import org.bibliotecaviva.backend.domain.entities.CommentSummary;
+import org.bibliotecaviva.backend.domain.entities.projections.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.exceptions.CommentNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
@@ -99,7 +99,9 @@ public class CommentService {
                 comment.getId(),
                 comment.getContent(),
                 comment.getUserName(),
+                comment.getUserId(),
                 comment.getWorkTitle(),
+                comment.getWorkId(),
                 comment.getCreatedAt()
         );
     }

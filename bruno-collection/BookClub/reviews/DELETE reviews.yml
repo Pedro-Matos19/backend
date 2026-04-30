@@ -1,0 +1,22 @@
+info:
+  name: DELETE reviews
+  type: http
+  seq: 4
+
+http:
+  method: DELETE
+  url: "{{api_url}}bookclub/{{bookclub_id}}/comments/{{review_id}}"
+  auth: inherit
+
+runtime:
+  variables:
+    - name: bookclub_id
+      value: b20f9de4-98cc-4a07-ba82-8889dcba456b
+    - name: review_id
+      value: 4741dd2b-2281-4bbd-8a80-28a7ed75d1dd
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

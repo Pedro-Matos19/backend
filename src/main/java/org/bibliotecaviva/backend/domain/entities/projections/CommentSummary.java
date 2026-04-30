@@ -1,4 +1,4 @@
-package org.bibliotecaviva.backend.domain.entities;
+package org.bibliotecaviva.backend.domain.entities.projections;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -10,7 +10,13 @@ public interface CommentSummary {
 
     String getUserName();
 
+    String getUserId();
+
     String getWorkTitle();
 
+    String getWorkId();
+
     LocalDateTime getCreatedAt();
+
+
 }

@@ -18,7 +18,8 @@ public record WorkSummaryResponseDTO(
         Long likeCount,
         Long commentCount,
         Duration duration,
-        String url
+        String url,
+        String studentClass
 ){
 }
 

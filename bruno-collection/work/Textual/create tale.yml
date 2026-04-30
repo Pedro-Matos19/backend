@@ -11,11 +11,12 @@ http:
     data: |-
       {
         "title": "A Serpente de Prata e o Rio de Mel",
-       "author": "aluno1@teste.com", 
+       "authorName": "Maria", 
         "publicationDate": "2026-03-30T17:00:00",
         "description": "Uma fábula regionalista sobre a ganância e a preservação dos recursos naturais.",
         "content": "Dizem os antigos que, no coração da mata, corria um rio cujas águas tinham o dulçor do mel silvestre. Uma serpente de escamas prateadas guardava a nascente, permitindo que cada animal bebesse apenas o necessário para saciar a sede. Certo dia, um caçador de fora tentou engarrafar o rio inteiro para vender na cidade. A serpente, em vez de atacá-lo, transformou o mel em água salgada. O homem chorou de sede, e suas lágrimas, ao caírem na terra, fizeram brotar espinhos. Desde então, o rio voltou a ser doce, mas apenas para quem chega de mãos vazias e coração limpo.",
-        "genre": "Fábula / Folclore"
+        "genre": "Fábula / Folclore",
+        "studentClass": "Terceiro B"
       }
   auth: inherit
 

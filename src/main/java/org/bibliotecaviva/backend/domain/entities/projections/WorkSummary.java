@@ -22,6 +22,8 @@ public interface WorkSummary {
 
     Long getLikeCount();
 
+    String getStudentClass();
+
     Long getCommentCount();
 
     String getUrl();

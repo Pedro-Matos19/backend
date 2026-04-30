@@ -34,4 +34,6 @@ public interface WorkResponse {
     Long likeCount();
 
     Long commentCount();
+    String studentClass();
+
 }

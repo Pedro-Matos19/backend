@@ -1,9 +1,3 @@
--- public.users definição
-
--- Drop table
-
--- DROP TABLE public.users;
-
 CREATE TABLE public.users
 (
     id             uuid         NOT NULL,
@@ -18,13 +12,6 @@ CREATE TABLE public.users
 ) )
 );
 
-
--- public.book_club definição
-
--- Drop table
-
--- DROP TABLE public.book_club;
-
 CREATE TABLE public.book_club
 (
     id            uuid NOT NULL,
@@ -34,16 +21,10 @@ CREATE TABLE public.book_club
     "date"        timestamp(6) NULL,
     "location"    varchar(255) NULL,
     organizer_id  uuid NULL,
+    book_cover_url  TEXT NULL,
     CONSTRAINT book_club_pkey PRIMARY KEY (id),
     CONSTRAINT fkj2h7pqx20fvjniqtykxi4fhjy FOREIGN KEY (organizer_id) REFERENCES public.users (id)
 );
-
-
--- public.book_club_participants definição
-
--- Drop table
-
--- DROP TABLE public.book_club_participants;
 
 CREATE TABLE public.book_club_participants
 (
@@ -54,12 +35,18 @@ CREATE TABLE public.book_club_participants
     CONSTRAINT fkm5dptso14xmdvd4q1ru25wbn FOREIGN KEY (book_club_id) REFERENCES public.book_club (id)
 );
 
-
--- public.obras definição
-
--- Drop table
-
--- DROP TABLE public.obras;
+create table book_club_reviews
+(
+    id           uuid         not null,
+    content      varchar(200) not null,
+    created_at   timestamp(6) not null,
+    rating       DECIMAL(2,1) not null check (rating >= 0 and rating <= 5),
+    book_club_id uuid         not null,
+    user_id      uuid         not null,
+    PRIMARY KEY (id),
+    CONSTRAINT FKg1ejaghxfur5gnq4gr12gf1uh FOREIGN KEY (book_club_id) REFERENCES book_club (id),
+    CONSTRAINT FK6n0blip1lvkyh90jbl1jwusx6 FOREIGN KEY (user_id) REFERENCES users (id)
+);
 
 CREATE TABLE public.obras
 (
@@ -69,19 +56,14 @@ CREATE TABLE public.obras
     publication_date timestamp(6) NULL,
     title            varchar(255) NULL,
     users_id         uuid NULL,
+    author_name       varchar(255) NULL,
+    student_class varchar(255) NOT NULL,
     view_count       int8 DEFAULT 0 NOT NULL,
     CONSTRAINT obras_pkey PRIMARY KEY (id),
     CONSTRAINT obras_type_check CHECK (((type)::text = ANY (ARRAY[('LibraLiterature':: character varying)::text, ('Multimedia':: character varying)::text, ('Article':: character varying)::text, ('Cordel':: character varying)::text, ('Essay':: character varying)::text, ('ShortStory':: character varying)::text, ('Tale':: character varying)::text, ('Art':: character varying)::text, ('Infographic':: character varying)::text])
 ) ),
 	CONSTRAINT fk2fptp0tpi0hv70i3cf78aev1t FOREIGN KEY (users_id) REFERENCES public.users(id)
 );
-
-
--- public.short_story definição
-
--- Drop table
-
--- DROP TABLE public.short_story;
 
 CREATE TABLE public.short_story
 (
@@ -90,13 +72,6 @@ CREATE TABLE public.short_story
     CONSTRAINT short_story_pkey PRIMARY KEY (id),
     CONSTRAINT fks0rnqq3wya1a06se7ca9gvjuh FOREIGN KEY (id) REFERENCES public.obras (id)
 );
-
-
--- public.tale definição
-
--- Drop table
-
--- DROP TABLE public.tale;
 
 CREATE TABLE public.tale
 (
@@ -107,13 +82,6 @@ CREATE TABLE public.tale
     CONSTRAINT fksqd2w8hahrvrb273ko7abkp64 FOREIGN KEY (id) REFERENCES public.obras (id)
 );
 
-
--- public.art definição
-
--- Drop table
-
--- DROP TABLE public.art;
-
 CREATE TABLE public.art
 (
     url TEXT NULL,
@@ -122,13 +90,6 @@ CREATE TABLE public.art
     CONSTRAINT fkay06evh3m16uloy5a1ao7hg3h FOREIGN KEY (id) REFERENCES public.obras (id)
 );
 
-
--- public.article definição
-
--- Drop table
-
--- DROP TABLE public.article;
-
 CREATE TABLE public.article
 (
     "content" text NULL,
@@ -136,13 +97,6 @@ CREATE TABLE public.article
     CONSTRAINT article_pkey PRIMARY KEY (id),
     CONSTRAINT fkst2v95jo66vjd7ssmfcluunjg FOREIGN KEY (id) REFERENCES public.obras (id)
 );
-
-
--- public."comments" definição
-
--- Drop table
-
--- DROP TABLE public."comments";
 
 CREATE TABLE public."comments"
 (
@@ -156,13 +110,6 @@ CREATE TABLE public."comments"
     CONSTRAINT fk8omq0tc18jd43bu5tjh6jvraq FOREIGN KEY (user_id) REFERENCES public.users (id)
 );
 
-
--- public.cordel definição
-
--- Drop table
-
--- DROP TABLE public.cordel;
-
 CREATE TABLE public.cordel
 (
     "content"    text NULL,
@@ -173,13 +120,6 @@ CREATE TABLE public.cordel
     CONSTRAINT  ilustrationfkey FOREIGN KEY (illustration_id) REFERENCES public.art (id),
     CONSTRAINT fkgwf8wt7aq919plt7il9iwjfsd FOREIGN KEY (illustration_id) REFERENCES public.obras (id)
 );
-
-
--- public.essay definição
-
--- Drop table
-
--- DROP TABLE public.essay;
 
 CREATE TABLE public.essay
 (
@@ -193,13 +133,6 @@ CREATE TABLE public.essay
     CONSTRAINT fkqgocmbwt6v8pbhu48jy70jm54 FOREIGN KEY (id) REFERENCES public.obras (id)
 );
 
-
--- public.infographic definição
-
--- Drop table
-
--- DROP TABLE public.infographic;
-
 CREATE TABLE public.infographic
 (
     url TEXT NULL,
@@ -207,13 +140,6 @@ CREATE TABLE public.infographic
     CONSTRAINT infographic_pkey PRIMARY KEY (id),
     CONSTRAINT fkq96d3tb77dwci88t9hq2lhcq5 FOREIGN KEY (id) REFERENCES public.obras (id)
 );
-
-
--- public.libra_literature definição
-
--- Drop table
-
--- DROP TABLE public.libra_literature;
 
 CREATE TABLE public.libra_literature
 (
@@ -224,13 +150,6 @@ CREATE TABLE public.libra_literature
     CONSTRAINT fkox8sb6jjxrhxa7ncugwoj8dqn FOREIGN KEY (id) REFERENCES public.obras (id)
 );
 
-
--- public.likes definição
-
--- Drop table
-
--- DROP TABLE public.likes;
-
 CREATE TABLE public.likes
 (
     user_id uuid NOT NULL,
@@ -240,13 +159,6 @@ CREATE TABLE public.likes
     CONSTRAINT fksfrbjomqnofi38udcrbwsj7q7 FOREIGN KEY (work_id) REFERENCES public.obras (id)
 );
 
-
--- public.multimedia definição
-
--- Drop table
-
--- DROP TABLE public.multimedia;
-
 CREATE TABLE public.multimedia
 (
     duration int8 NULL,
@@ -255,10 +167,11 @@ CREATE TABLE public.multimedia
     CONSTRAINT multimedia_pkey PRIMARY KEY (id),
     CONSTRAINT fkd84k95871jtaji3mfjtb0td8a FOREIGN KEY (id) REFERENCES public.obras (id)
 );
--- Seed data for Biblioteca Viva domain entities.
--- Important: this script assumes tables already exist (Hibernate `ddl-auto=create` or migrations).
--- password: 123456
 
+-- =========================================================
+-- Seed data for Biblioteca Viva
+-- password: 123456
+-- =========================================================
 INSERT INTO users (id, email, name, password, role, account_status)
 VALUES ('e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf', 'aluno1@teste.com', 'aluno1',
         '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ALUNO', 'ACTIVE'),
@@ -272,211 +185,236 @@ VALUES ('e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf', 'aluno1@teste.com', 'aluno1',
         '$2y$10$GFIf48kDF3iZ1gDdCbKIVe2u51YJ2p9BdHhAokyEzc9CU6l0Ol/QO', 'ADMIN', 'ACTIVE');
 
 -- ========================================================
+-- Users ids for reference
 -- Aluno 1: e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf
 -- Aluno 2: eca64533-6dbd-465b-863c-bb540fecdc61
 -- Aluno 3: 4c9f354b-0780-4cdb-b76f-d43e54ea3644
+-- Professor: 455150bd-8e40-498c-8005-cca9cefa909
 -- ========================================================
+
+
 -- ============================================================
--- BIBLIOTECA VIVA — SEED DE DADOS REALISTAS
--- Mantém todos os IDs e user_ids originais
+-- BIBLIOTECA VIVA — SEED DE DADOS
 -- ============================================================
 
 -- ============================================================
--- WORKS (tabela base da hierarquia)
+-- Obras
 -- ============================================================
-INSERT INTO obras (id, title, users_id, publication_date, description, type)
+INSERT INTO obras (id, title, users_id, publication_date, description, type,student_class)
 VALUES
     -- Aluno 1 (e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf)
-
-
 
     ('44444444-4444-4444-4444-444444444001',
      'A Janela Azul',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2023-11-21',
      'Crônica sobre memória afetiva e o olhar de infância, narrada pela perspectiva de uma menina que encontra no azul de uma janela a fronteira entre o cotidiano e a imaginação.',
-     'ShortStory'),
-
-    ('44444444-4444-4444-4444-444444444002',
-     'Chuva Mansa',
-     'eca64533-6dbd-465b-863c-bb540fecdc61',
-     '2024-02-14',
-     'Crônica ambientada em uma tarde chuvosa em Garanhuns, que acompanha dois amigos num alpendre e o silêncio carregado de uma despedida que nenhum dos dois consegue nomear.',
-     'ShortStory'),
-
-    ('44444444-4444-4444-4444-444444444003',
-     'O Trem das Seis',
-     '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
-     '2024-10-01',
-     'Crônica de observação sobre os passageiros de um trem do interior, explorando o que as pessoas carregam em silêncio e o que o movimento cotidiano revela sobre memória e tempo.',
-     'ShortStory'),
+     'ShortStory',
+     '1º A'),
 
     ('55555555-5555-5555-5555-555555555003',
      'O Pássaro Dourado',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-08-03',
      'Fábula sobre escuta e coletividade: um pássaro estranho chega a uma floresta de cantos solitários e, sem impor nada, transforma a forma como todos se relacionam com a própria voz.',
-     'Tale'),
-
-    ('55555555-5555-5555-5555-555555555001',
-     'A Pedra Encantada',
-     'eca64533-6dbd-465b-863c-bb540fecdc61',
-     '2023-12-30',
-     'Conto de fantasia regional ambientado em território Xukuru, em que o surgimento misterioso de uma pedra em forma humana divide a aldeia entre o medo e a curiosidade — até que a chuva responde.',
-     'Tale'),
-
-    ('55555555-5555-5555-5555-555555555002',
-     'O Vento Norte',
-     '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
-     '2024-03-18',
-     'Conto popular sobre uma menina perdida na caatinga que segue um vento com direção própria, adaptado de narrativa oral preservando a cadência dos contadores de histórias da região.',
-     'Tale'),
+     'Tale',
+     '1º A'),
 
     ('11111111-1111-1111-1111-111111111001',
      'Reportagem sobre o Rio Capibaribe',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-03-10',
      'Reportagem escolar sobre a história e os desafios ambientais do Rio Capibaribe, abordando a poluição, o desmatamento das margens e iniciativas de preservação da bacia hidrográfica.',
-     'Article'),
+     'Article',
+     '1º A'),
 
     ('22222222-2222-2222-2222-222222222001',
      'Cordel da Feira Popular',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2023-09-12',
      'Cordel sobre personagens e histórias da feira local, retratando o vendedor de rapadura, a barraqueira de tapioca e o repentista que anima as manhãs de sábado.',
-     'Cordel'),
+     'Cordel',
+     '1º A'),
 
     ('33333333-3333-3333-3333-333333333001',
      'Redação ENEM: Inclusão Digital',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-04-05',
      'Redação dissertativa-argumentativa sobre o acesso à tecnologia como fator determinante na ampliação ou redução das desigualdades sociais no Brasil contemporâneo.',
-     'Essay'),
-
-
+     'Essay',
+     '1º A'),
 
     ('66666666-6666-6666-6666-666666666001',
      'Cartaz Digital: Semana da Leitura',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-01-05',
      'Peça visual produzida para divulgar as atividades da Semana Cultural da Escola, com identidade gráfica baseada em tipografia expressiva e cores vibrantes.',
-     'Art'),
+     'Art',
+     '1º A'),
 
     ('66616666-6666-6666-6666-666666666001',
      'Ilustração: Cordel do Sertão Vivo',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2026-01-04',
      'Ilustração para cordel',
-     'Art'),
+     'Art',
+     '1º A'),
 
     ('66626666-6666-6666-6666-666666666001',
      'Ilustração: Cordel da Juventude',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2026-01-04',
      'Ilustração para cordel',
-     'Art'),
+     'Art',
+     '1º A'),
 
     ('66636666-6666-6666-6666-666666666001',
      'Ilustração: Cordel da Feira Popular',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2026-01-04',
      'Ilustração para cordel',
-     'Art'),
+     'Art',
+     '1º A'),
 
     ('77777777-7777-7777-7777-777777777001',
      'Infográfico: Ciclo da Água',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2023-10-09',
      'Infográfico educativo explicando as etapas do ciclo hidrológico — evaporação, condensação, precipitação e infiltração — com linguagem acessível ao público escolar.',
-     'Infographic'),
+     'Infographic',
+     '1º A'),
 
     ('88888888-8888-8888-8888-888888888001',
      'Curta: Vozes da Juventude',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-02-01',
      'Curta-metragem escolar com depoimentos de estudantes sobre perspectivas de futuro, educação e sonhos profissionais no contexto do semiárido nordestino.',
-     'Multimedia'),
+     'Multimedia',
+     '1º A'),
 
     ('99999999-9999-9999-9999-999999999001',
      'Literatura em Libras: O Menino e a Lua',
      'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
      '2024-03-03',
      'Narrativa sinalizada adaptada para o público infantojuvenil, baseada em um conto original sobre um menino que tenta alcançar a lua e aprende sobre limites e sonhos.',
-     'LibraLiterature'),
+     'LibraLiterature',
+     '1º A'),
 
     -- Aluno 2 (eca64533-6dbd-465b-863c-bb540fecdc61)
+
+    ('44444444-4444-4444-4444-444444444002',
+     'Chuva Mansa',
+     'eca64533-6dbd-465b-863c-bb540fecdc61',
+     '2024-02-14',
+     'Crônica ambientada em uma tarde chuvosa em Garanhuns, que acompanha dois amigos num alpendre e o silêncio carregado de uma despedida que nenhum dos dois consegue nomear.',
+     'ShortStory',
+     '2º B'),
+
+    ('55555555-5555-5555-5555-555555555001',
+     'A Pedra Encantada',
+     'eca64533-6dbd-465b-863c-bb540fecdc61',
+     '2023-12-30',
+     'Conto de fantasia regional ambientado em território Xukuru, em que o surgimento misterioso de uma pedra em forma humana divide a aldeia entre o medo e a curiosidade — até que a chuva responde.',
+     'Tale',
+     '2º B'),
+
     ('11111111-1111-1111-1111-111111111002',
      'Artigo: Literatura na Comunidade',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-05-01',
      'Reflexão sobre o impacto de projetos comunitários de leitura em bairros periféricos, com base em entrevistas realizadas em duas iniciativas locais de Garanhuns.',
-     'Article'),
+     'Article',
+     '2º B'),
 
     ('22222222-2222-2222-2222-222222222002',
      'Cordel do Sertão Vivo',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-01-19',
      'Versos em linguagem popular sobre memória, resistência e cultura do sertão nordestino, com referências às tradições do vaqueiro, da cantoria e das festas de São João.',
-     'Cordel'),
+     'Cordel',
+     '2º B'),
 
     ('33333333-3333-3333-3333-333333333002',
      'Redação ENEM: Sustentabilidade Urbana',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-06-10',
      'Discussão sobre os desafios da mobilidade urbana, gestão de resíduos sólidos e implementação de políticas públicas ambientais em municípios de médio porte.',
-     'Essay'),
-
-
+     'Essay',
+     '2º B'),
 
     ('66666666-6666-6666-6666-666666666002',
      'Ilustração: Jardim da Escola',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-04-12',
      'Arte digital inspirada no espaço de convivência da escola, retratando o jardim central com suas flores nativas, a mangueira centenária e os estudantes em roda de conversa.',
-     'Art'),
+     'Art',
+     '2º B'),
 
     ('77777777-7777-7777-7777-777777777002',
      'Infográfico: Alimentação Saudável',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-05-23',
      'Resumo visual com orientações sobre hábitos alimentares saudáveis baseados na alimentação regional, destacando frutas, verduras e proteínas do semiárido nordestino.',
-     'Infographic'),
+     'Infographic',
+     '2º B'),
 
     ('88888888-8888-8888-8888-888888888002',
      'Vídeo-poema: Mar de Dentro',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-06-28',
      'Vídeo-poema autoral com leitura dramatizada e trilha sonora original, explorando a relação entre o sertão e o mar como metáforas de distância, pertencimento e saudade.',
-     'Multimedia'),
+     'Multimedia',
+     '2º B'),
 
     ('99999999-9999-9999-9999-999999999002',
      'Literatura em Libras: A Festa da Rua',
      'eca64533-6dbd-465b-863c-bb540fecdc61',
      '2024-07-17',
      'Performance em Libras baseada em crônica comunitária, narrando as memórias de uma festa junina de rua e a solidariedade entre vizinhos durante os preparativos.',
-     'LibraLiterature'),
+     'LibraLiterature',
+     '2º B'),
 
     -- Aluno 3 (4c9f354b-0780-4cdb-b76f-d43e54ea3644)
+
+    ('44444444-4444-4444-4444-444444444003',
+     'O Trem das Seis',
+     '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
+     '2024-10-01',
+     'Crônica de observação sobre os passageiros de um trem do interior, explorando o que as pessoas carregam em silêncio e o que o movimento cotidiano revela sobre memória e tempo.',
+     'ShortStory',
+     '3º A'),
+
+    ('55555555-5555-5555-5555-555555555002',
+     'O Vento Norte',
+     '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
+     '2024-03-18',
+     'Conto popular sobre uma menina perdida na caatinga que segue um vento com direção própria, adaptado de narrativa oral preservando a cadência dos contadores de histórias da região.',
+     'Tale',
+     '3º A'),
+
     ('11111111-1111-1111-1111-111111111003',
      'Matéria Especial: Vozes da Escola',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-08-15',
      'Coletânea de entrevistas com estudantes do ensino médio sobre o processo de produção textual, revelando desafios, descobertas e a relação de cada um com a escrita criativa.',
-     'Article'),
+     'Article',
+     '3º A'),
 
     ('22222222-2222-2222-2222-222222222003',
      'Cordel da Juventude',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-07-02',
      'Narrativa em cordel sobre sonhos e trajetórias de jovens estudantes do semiárido, abordando vestibular, primeiro emprego, partida para a cidade e saudade da terra natal.',
-     'Cordel'),
+     'Cordel',
+     '3º A'),
 
     ('33333333-3333-3333-3333-333333333003',
      'Redação ENEM: Leitura e Cidadania',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-09-08',
      'Argumentação sobre o papel das bibliotecas escolares como espaços de transformação social, cidadania e combate às desigualdades no acesso ao conhecimento.',
-     'Essay'),
+     'Essay',
+     '3º A'),
 
 
     ('66666666-6666-6666-6666-666666666003',
@@ -484,28 +422,32 @@ VALUES
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-09-20',
      'História em quadrinhos sobre o cotidiano da biblioteca escolar, com personagens estudantis que descobrem mundos através dos livros e formam um clube secreto de leitores.',
-     'Art'),
+     'Art',
+     '3º A'),
 
     ('77777777-7777-7777-7777-777777777003',
      'Infográfico: História do Bairro',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-11-11',
      'Linha do tempo visual com marcos históricos da comunidade escolar, desde a fundação do bairro até a inauguração da biblioteca, integrando fotos antigas e depoimentos de moradores.',
-     'Infographic'),
+     'Infographic',
+     '3º A'),
 
     ('88888888-8888-8888-8888-888888888003',
      'Entrevista: Mestres da Comunidade',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-10-22',
      'Série de entrevistas em vídeo com lideranças locais e artistas populares, documentando saberes tradicionais, histórias de vida e o papel da cultura na identidade comunitária.',
-     'Multimedia'),
+     'Multimedia',
+     '3º A'),
 
     ('99999999-9999-9999-9999-999999999003',
      'Literatura em Libras: Pequenas Coragens',
      '4c9f354b-0780-4cdb-b76f-d43e54ea3644',
      '2024-12-02',
      'Narração visual em Libras sobre autonomia e pertencimento, adaptada de um conto original que celebra as pequenas vitórias cotidianas de uma criança surda na escola regular.',
-     'LibraLiterature');
+     'LibraLiterature',
+     '3º A');
 
 
 -- ============================================================
@@ -662,17 +604,37 @@ VALUES ('99999999-9999-9999-9999-999999999001',
 
 
 
-INSERT INTO book_club (id, book_author, book_name, book_synopses, date, location, organizer_id)
+INSERT INTO book_club (id, book_author, book_name, book_synopses, date, location, organizer_id,book_cover_url)
 VALUES ('11111111-1111-1111-1111-111111111001', 'Jorge Amado', 'Gabriela, Cravo e Canela',
         'A história de Gabriela, uma jovem baiana que chega a Ilhéus para trabalhar como empregada doméstica e acaba conquistando o coração de Nacib, um árabe dono de bar. O romance se desenrola em meio às transformações sociais e culturais do Brasil dos anos 1920, explorando temas como amor, poder e identidade.',
-        '2026-04-15', 'Biblioteca Municipal', '455150bd-8e40-498c-8005-cca9cefa9099'),
+        '2026-05-15', 'Biblioteca Municipal', '455150bd-8e40-498c-8005-cca9cefa9099','https://m.media-amazon.com/images/I/71k7DZPx+uL._UF1000,1000_QL80_.jpg'),
        ('22222222-2222-2222-2222-222222222002', 'Clarice Lispector', 'A Hora da Estrela',
         'A narrativa acompanha Macabéa, uma jovem nordestina que se muda para o Rio de Janeiro em busca de uma vida melhor. Através de uma escrita introspectiva e poética, Clarice Lispector explora a solidão, a busca por identidade e as contradições da existência humana.',
-        '2026-04-30', 'Centro Cultural', '455150bd-8e40-498c-8005-cca9cefa9099'),
-       ('33333333-3333-3333-3333-333333333003', 'Machado de Assis', 'Dom Casmurro',
-        'A história de Bentinho e Capitu, narrada por Bentinho em um tom melancólico e ambíguo. O romance aborda temas como ciúme, traição e a complexidade das relações humanas, deixando o leitor questionando a veracidade dos acontecimentos narrados.',
-        '2026-04-25', 'Escola Estadual', '455150bd-8e40-498c-8005-cca9cefa9099');
+        '2026-06-30', 'Centro Cultural', '455150bd-8e40-498c-8005-cca9cefa9099','https://m.media-amazon.com/images/I/51jDqmWjALL._SL500_.jpg'),
 
+        ('33333333-3333-3333-3333-333333333003', 'Machado de Assis', 'Dom Casmurro',
+        'A história de Bentinho e Capitu, narrada por Bentinho em um tom melancólico e ambíguo. O romance aborda temas como ciúme, traição e a complexidade das relações humanas, deixando o leitor questionando a veracidade dos acontecimentos narrados.',
+        '2026-07-25', 'Escola Estadual', '455150bd-8e40-498c-8005-cca9cefa9099','https://m.media-amazon.com/images/I/81XpG2iKTlL._AC_UF1000,1000_QL80_.jpg');
+
+-- ============================================================
+--  SEED DE REVIEWS DO CLUBE DO LIVRO
+-- ============================================================
+INSERT INTO book_club_reviews (id, content, created_at, rating, book_club_id, user_id)
+VALUES
+    -- Gabriela, Cravo e Canela
+    (gen_random_uuid(), 'Adorei a forma como Jorge Amado retrata a cultura baiana. Gabriela é um personagem muito marcante!', '2026-05-15 14:00:00', 4.5, '11111111-1111-1111-1111-111111111001', 'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf'),
+    (gen_random_uuid(), 'A história me surpreendeu bastante. O cenário de Ilhéus dos anos 1920 é muito bem construído.', '2026-05-15 14:20:00', 4.0, '11111111-1111-1111-1111-111111111001', 'eca64533-6dbd-465b-863c-bb540fecdc61'),
+    (gen_random_uuid(), 'Gostei muito da discussão sobre identidade e amor. Leitura leve e envolvente.', '2026-05-15 14:45:00', 5.0, '11111111-1111-1111-1111-111111111001', '4c9f354b-0780-4cdb-b76f-d43e54ea3644'),
+
+    -- A Hora da Estrela
+    (gen_random_uuid(), 'Clarice é densa, mas a Macabéa fica na memória. Uma leitura que exige atenção e sensibilidade.', '2026-06-30 15:00:00', 4.5, '22222222-2222-2222-2222-222222222002', 'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf'),
+    (gen_random_uuid(), 'Não foi minha leitura favorita, achei difícil de acompanhar, mas entendo a importância da obra.', '2026-06-30 15:30:00', 3.0, '22222222-2222-2222-2222-222222222002', 'eca64533-6dbd-465b-863c-bb540fecdc61'),
+    (gen_random_uuid(), 'A solidão da Macabéa me tocou muito. Clarice consegue falar do invisível de um jeito único.', '2026-06-30 15:50:00', 5.0, '22222222-2222-2222-2222-222222222002', '4c9f354b-0780-4cdb-b76f-d43e54ea3644'),
+
+    -- Dom Casmurro
+    (gen_random_uuid(), 'Machado de Assis é genial. A ambiguidade da narrativa do Bentinho deixa a gente pensando até o fim.', '2026-07-25 16:00:00', 5.0, '33333333-3333-3333-3333-333333333003', 'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf'),
+    (gen_random_uuid(), 'Capitu traiu ou não? Debatemos muito isso no clube. Leitura obrigatória!', '2026-07-25 16:15:00', 4.5, '33333333-3333-3333-3333-333333333003', 'eca64533-6dbd-465b-863c-bb540fecdc61'),
+    (gen_random_uuid(), 'Gostei bastante, mas a visão do Bentinho me incomodou. É exatamente esse o ponto, acho.', '2026-07-25 16:40:00', 4.0, '33333333-3333-3333-3333-333333333003', '4c9f354b-0780-4cdb-b76f-d43e54ea3644');
 -- ============================================================
 -- BIBLIOTECA VIVA — SEED DE COMENTÁRIOS
 -- Aluno 1: e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf

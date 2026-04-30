@@ -11,14 +11,15 @@ http:
     data: |-
       {
         "title": "O Impacto da Literacia Digital na Democracia Contemporânea",
-        "author": "aluno1@teste.com",
+        "authorEmail": "aluno1@teste.com",
         "publicationDate": "2026-03-30T10:15:00",
         "description": "Ensaio crítico sobre a relação entre o acesso à informação e o exercício da cidadania no ambiente virtual.",
         "content": "A democracia no século XXI não se limita mais ao voto físico, mas expande-se para o debate em redes digitais. No entanto, a desinformação surge como um obstáculo severo. Este ensaio argumenta que a literacia digital — a capacidade de consumir e produzir criticamente conteúdos na rede — é o novo pilar da liberdade individual. Analisamos como algoritmos de recomendação criam bolhas de confirmação e propomos que as bibliotecas públicas assumam o papel de centros de educação midiática para mitigar o efeito das 'fake news'.",
         "rate": 920,  
         "theme": "Educação e Cidadania",
         "themeDescription": "Eixo temático focado na formação do indivíduo e sua atuação política e social através do conhecimento.",
-        "feedback": "Excelente articulação de ideias e repertório sociocultural diversificado. A proposta de intervenção citando as bibliotecas públicas foi o ponto alto do texto. Atenção apenas à concordância verbal no segundo parágrafo."
+        "feedback": "Excelente articulação de ideias e repertório sociocultural diversificado. A proposta de intervenção citando as bibliotecas públicas foi o ponto alto do texto. Atenção apenas à concordância verbal no segundo parágrafo.",
+        "studentClass": "Terceiro B"
       }
   auth: inherit
 

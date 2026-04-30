@@ -19,6 +19,8 @@ public record EssayResponseDTO(
         String feedback,
         Long viewCount,
         Long likeCount,
-        Long commentCount
+        Long commentCount,
+        String studentClass
+
 ) implements WorkResponse {
 }

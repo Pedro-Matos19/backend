@@ -8,6 +8,11 @@ http:
   url: "{{api_url}}bookclub/{{id}}/subscribe"
   auth: inherit
 
+runtime:
+  variables:
+    - name: id
+      value: 33333333-3333-3333-3333-333333333003
+
 settings:
   encodeUrl: true
   timeout: 0

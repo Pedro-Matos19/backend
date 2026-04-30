@@ -9,9 +9,9 @@ import org.bibliotecaviva.backend.application.dtos.request.audiovisual.Multimedi
 import org.bibliotecaviva.backend.application.dtos.request.textual.*;
 import org.bibliotecaviva.backend.application.dtos.request.visual.ArtRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.visual.InfographicRequestDTO;
+import org.bibliotecaviva.backend.application.dtos.response.HomePageDashboardResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
-import org.bibliotecaviva.backend.application.dtos.response.HomePageDashboardResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.WorkSummaryResponseDTO;
 import org.bibliotecaviva.backend.application.mappers.WorkMapper;
 import org.bibliotecaviva.backend.domain.entities.User;
@@ -57,7 +57,7 @@ public class WorkService {
                 .map(workMapper::toWorkSummary);
     }
 
-    // todo: - verificar view count (vai dar gargalo ficar fazendo update assim)
+    // todo: - verificar view count, batch update com cache se necessário
     // - da pra melhorar a performace pq ta fazendo o join com todas as tabelas
     // desnecessariamente
     public WorkResponse getById(UUID id) {
@@ -70,9 +70,13 @@ public class WorkService {
 
     @Transactional
     public <T extends WorkRequest> WorkResponse create(T dto) {
+        if (dto.authorEmail() != null && dto.authorName() != null) {
+            throw new IllegalArgumentException("Informe apenas um dos campos: email ou nome");
+        }
+        if (dto.authorEmail() == null && dto.authorName() == null) {
+            throw new IllegalArgumentException("Forneça um usuário cadastrado ou o nome do autor");
+        }
 
-        User author = userRepository.findByEmail(dto.author())
-                .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.author()));
         Work work = switch (dto) {
             case EssayRequestDTO d -> workMapper.toEntity(d);
             case ArtRequestDTO d -> workMapper.toEntity(d);
@@ -86,17 +90,25 @@ public class WorkService {
             default -> throw new IllegalArgumentException(
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         };
-        if(work instanceof Cordel){
-            var arte = (Art)workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
+        if (work instanceof Cordel) {
+            var arte = (Art) workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
                     .orElseThrow(() -> new WorkNotFoundException("Obra de arte com nome " + ((CordelRequestDTO) dto).artName() + " não encontrada"));
             ((Cordel) work).setIllustration(arte);
         }
-        work.setAuthor(author);
-        work.setViewCount(0L);
-        // todo: pode verificar por tipo tambem, ver isso dps
-        if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
-            throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
+
+        if (dto.authorEmail() != null && dto.authorName() == null) {
+           var user = userRepository.findByEmail(dto.authorEmail())
+                    .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.authorEmail()));
+            work.setAuthor(user);
+        } else {
+           work.setAuthorName(dto.authorName());
         }
+        work.setViewCount(0L);
+
+        // todo: depois faz isso ai, verificar regras de duplicata e ajustar o autor
+//        if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
+//            throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
+//        }
         return workMapper.toDTO(workRepository.save(work), 0L, 0L);
     }
 
@@ -118,18 +130,18 @@ public class WorkService {
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         }
 
-        if (dto.author() != null && !dto.author().isBlank()) {
-            User user = userRepository.findByEmail(dto.author())
-                    .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.author()));
+        if (dto.authorEmail() != null && dto.authorName() == null) {
+            var user = userRepository.findByEmail(dto.authorEmail())
+                    .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.authorEmail()));
             work.setAuthor(user);
+        } else {
+            work.setAuthorName(dto.authorName());
         }
-        if(work instanceof Cordel){
-            var arte = (Art)workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
+        if (work instanceof Cordel) {
+            var arte = (Art) workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
                     .orElseThrow(() -> new WorkNotFoundException("Obra de arte com nome " + ((CordelRequestDTO) dto).artName() + " não encontrada"));
             ((Cordel) work).setIllustration(arte);
         }
-        // todo: verificar update, provvavelmente pode quebrar regra de author e nome de
-        // obra
         return workMapper.toDTO(workRepository.save(work), workRepository.getLikeCount(id),
                 commentRepository.countByWork_Id(id));
     }

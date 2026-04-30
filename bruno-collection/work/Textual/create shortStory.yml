@@ -11,10 +11,11 @@ http:
     data: |-
       {
         "title": "O Sussurro das Páginas Esquecidas",
-       "author": "aluno1@teste.com", 
+       "authorEmail": "aluno1@teste.com", 
         "publicationDate": "2026-03-30T16:45:00",
         "description": "Um conto fantástico sobre uma biblioteca onde os livros ganham voz quando as luzes se apagam.",
-        "content": "Era meia-noite quando o primeiro estalo ecoou pelo corredor de carvalho. Não era o prédio assentando, mas o 'Dom Quixote' bocejando na prateleira C-12. Naquela biblioteca, as histórias não aceitavam o silêncio do papel. As palavras de Clarice Lispector flutuavam como névoa entre as estantes, misturando-se aos versos de Drummond. O vigia, um senhor de passos macios, fingia não ouvir. Ele sabia que, enquanto houvesse alguém para imaginar, as páginas jamais estariam realmente quietas. O segredo da imortalidade, ele descobriu, não estava na tinta, mas no fôlego de quem ousava ler o invisível."
+        "content": "Era meia-noite quando o primeiro estalo ecoou pelo corredor de carvalho. Não era o prédio assentando, mas o 'Dom Quixote' bocejando na prateleira C-12. Naquela biblioteca, as histórias não aceitavam o silêncio do papel. As palavras de Clarice Lispector flutuavam como névoa entre as estantes, misturando-se aos versos de Drummond. O vigia, um senhor de passos macios, fingia não ouvir. Ele sabia que, enquanto houvesse alguém para imaginar, as páginas jamais estariam realmente quietas. O segredo da imortalidade, ele descobriu, não estava na tinta, mas no fôlego de quem ousava ler o invisível.",
+        "studentClass": "Terceiro B"
       }
   auth: inherit
 

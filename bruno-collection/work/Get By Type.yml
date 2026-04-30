@@ -5,10 +5,10 @@ info:
 
 http:
   method: GET
-  url: "{{api_url}}work?type=art"
+  url: "{{api_url}}work?type=essay"
   params:
     - name: type
-      value: art
+      value: essay
       type: query
   auth: inherit
 

@@ -6,12 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.AdminDashboardResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.UserResponseDTO;
-import org.bibliotecaviva.backend.application.services.CommentService;
-import org.bibliotecaviva.backend.application.services.UserManagementService;
-import org.bibliotecaviva.backend.application.services.WorkService;
+import org.bibliotecaviva.backend.application.services.*;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +30,7 @@ public class AdminController {
     private final UserManagementService userManagementService;
     private final CommentService commentService;
     private final WorkService workService;
+    private final BookClubReviewService bookClubReviewService;
 
     //todo: registrar conta de curador / trocar role pra curador / deletar
 
@@ -77,8 +77,15 @@ public class AdminController {
     @GetMapping("/comments")
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponse(responseCode = "200", description = "Comments retrieved successfully")
-    public ResponseEntity<Page<CommentSummaryResponseDTO>> getAllComments(@PageableDefault() Pageable pageable) {
+    public ResponseEntity<Page<CommentSummaryResponseDTO>> getAllComments(@PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(commentService.getAll(pageable));
+    }
+
+    @GetMapping("/reviews")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiResponse(responseCode = "200", description = "BookClub reviews retrieved successfully")
+    public ResponseEntity<Page<ReviewSummaryResponseDTO>> getAllReviews(@PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(bookClubReviewService.getAll(pageable));
     }
 
     @GetMapping("/dashboard")
@@ -87,6 +94,7 @@ public class AdminController {
         return ResponseEntity.ok(new AdminDashboardResponseDTO(
                 workService.countWorks(),
                 commentService.countComments(),
+                bookClubReviewService.countReviews(),
                 userManagementService.countUsers(),
                 userManagementService.countPendingUsers()));
     }

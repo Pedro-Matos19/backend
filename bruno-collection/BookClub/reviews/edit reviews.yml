@@ -1,0 +1,29 @@
+info:
+  name: edit reviews
+  type: http
+  seq: 3
+
+http:
+  method: PUT
+  url: "{{api_url}}bookclub/{{bookclub_id}}/comments/{{review_id}}"
+  body:
+    type: json
+    data: |-
+      {
+        "content": "Mais ou menos",
+        "rating": 1
+      }
+  auth: inherit
+
+runtime:
+  variables:
+    - name: bookclub_id
+      value: b20f9de4-98cc-4a07-ba82-8889dcba456b
+    - name: review_id
+      value: 4741dd2b-2281-4bbd-8a80-28a7ed75d1dd
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
