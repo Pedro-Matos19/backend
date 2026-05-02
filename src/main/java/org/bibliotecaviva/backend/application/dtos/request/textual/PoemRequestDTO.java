@@ -5,10 +5,7 @@ import org.bibliotecaviva.backend.application.dtos.request.WorkRequest;
 
 import java.time.LocalDateTime;
 
-/**
- * DTO for {@link org.bibliotecaviva.backend.domain.entities.textual.Tale}
- */
-public record TaleRequestDTO(
+public record PoemRequestDTO(
         @NotBlank(message = "Title cannot be blank") @Size(min = 3, max = 255, message = "Title must be between 3 and 255 characters")
         String title,
         @Email(message = "Author must be a valid email address") String authorEmail,
@@ -19,9 +16,13 @@ public record TaleRequestDTO(
         String description,
         @NotBlank(message = "Content can not be blank") //Veriicar dps se coloca minimo e maximo de caracteres
         String content,
-        @NotBlank(message = "Genre cannot be blank") @Size(min = 3, max = 100, message = "Genre must be between 3 and 100 characters")
-        String genre,
         @NotBlank @Size(min = 3, max = 50, message = "Student class must be between 3 and 50 characters")
-        String studentClass
+        String studentClass,
+        @NotBlank
+        String rhymeScheme,
+        @NotBlank
+        String poemType
 ) implements WorkRequest {
+
+
 }

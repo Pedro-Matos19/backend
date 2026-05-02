@@ -7,15 +7,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.bibliotecaviva.backend.application.dtos.request.textual.PoemRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.audiovisual.LibraLiteratureRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.audiovisual.MultimediaRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.textual.*;
 import org.bibliotecaviva.backend.application.dtos.request.visual.ArtRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.request.visual.InfographicRequestDTO;
-import org.bibliotecaviva.backend.application.dtos.response.HomePageDashboardResponseDTO;
-import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
-import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
-import org.bibliotecaviva.backend.application.dtos.response.WorkSummaryResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.*;
 import org.bibliotecaviva.backend.application.dtos.response.audiovisual.LibraLiteratureResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.audiovisual.MultimediaResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.textual.*;
@@ -94,7 +92,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<LikeResponseDTO> likeWork(@PathVariable UUID id,
-            @AuthenticationPrincipal User user) {
+                                                    @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(service.like(id, user));
     }
 
@@ -103,9 +101,28 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<LikeResponseDTO> unLike(@PathVariable UUID id,
-            @AuthenticationPrincipal User user) {
+                                                  @AuthenticationPrincipal User user) {
         return ResponseEntity.ok(service.unLike(id, user));
     }
+
+    @PostMapping("/poems")
+    @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = PoemResponseDTO.class)), description = "Created")
+    @ApiResponse(responseCode = "409", content = @Content, description = "Work Already Exists")
+    @ApiResponse(responseCode = "404", content = @Content, description = "Author Not Found")
+    @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
+    public ResponseEntity<WorkResponse> createPoem(@RequestBody @Valid PoemRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
+    }
+
+    @PutMapping("/poems/{id}")
+    @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(implementation = PoemResponseDTO.class)), description = "Updated")
+    @ApiResponse(responseCode = "409", content = @Content, description = "Work Already Exists")
+    @ApiResponse(responseCode = "404", content = @Content, description = "Wokr or Author Not Found")
+    @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
+    public ResponseEntity<WorkResponse> updatePoem(@PathVariable UUID id, @RequestBody @Valid PoemRequestDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
+
 
     @PostMapping("/articles")
     @ApiResponse(responseCode = "201", content = @Content(schema = @Schema(implementation = ArticleResponseDTO.class)), description = "Created")
@@ -122,7 +139,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Work or Author Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> updateArticle(@PathVariable UUID id,
-            @RequestBody @Valid ArticleRequestDTO dto) {
+                                                      @RequestBody @Valid ArticleRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -177,7 +194,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Work or Author Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> updateShortStory(@PathVariable UUID id,
-            @RequestBody @Valid ShortStoryRequestDTO dto) {
+                                                         @RequestBody @Valid ShortStoryRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -232,7 +249,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Work or Author Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> updateInfographic(@PathVariable UUID id,
-            @RequestBody @Valid InfographicRequestDTO dto) {
+                                                          @RequestBody @Valid InfographicRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -251,7 +268,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Work or Author Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> updateMultimedia(@PathVariable UUID id,
-            @RequestBody @Valid MultimediaRequestDTO dto) {
+                                                         @RequestBody @Valid MultimediaRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -270,7 +287,7 @@ public class WorkController {
     @ApiResponse(responseCode = "404", content = @Content, description = "Work or Author Not Found")
     @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
     public ResponseEntity<WorkResponse> updateLibraLiterature(@PathVariable UUID id,
-            @RequestBody @Valid LibraLiteratureRequestDTO dto) {
+                                                              @RequestBody @Valid LibraLiteratureRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 }

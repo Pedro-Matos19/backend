@@ -21,6 +21,5 @@ public record MultimediaResponseDTO(
         String studentClass
 
 
-
 ) implements WorkResponse {
 }

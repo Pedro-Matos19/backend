@@ -60,11 +60,20 @@ CREATE TABLE public.obras
     student_class varchar(255) NOT NULL,
     view_count       int8 DEFAULT 0 NOT NULL,
     CONSTRAINT obras_pkey PRIMARY KEY (id),
-    CONSTRAINT obras_type_check CHECK (((type)::text = ANY (ARRAY[('LibraLiterature':: character varying)::text, ('Multimedia':: character varying)::text, ('Article':: character varying)::text, ('Cordel':: character varying)::text, ('Essay':: character varying)::text, ('ShortStory':: character varying)::text, ('Tale':: character varying)::text, ('Art':: character varying)::text, ('Infographic':: character varying)::text])
+    CONSTRAINT obras_type_check CHECK (((type)::text = ANY (ARRAY[('LibraLiterature':: character varying)::text, ('Multimedia':: character varying)::text,('Poem':: character varying)::text, ('Article':: character varying)::text, ('Cordel':: character varying)::text, ('Essay':: character varying)::text, ('ShortStory':: character varying)::text, ('Tale':: character varying)::text, ('Art':: character varying)::text, ('Infographic':: character varying)::text])
 ) ),
 	CONSTRAINT fk2fptp0tpi0hv70i3cf78aev1t FOREIGN KEY (users_id) REFERENCES public.users(id)
 );
 
+CREATE TABLE public.poem
+(
+    id           UUID NOT NULL,
+    content      TEXT,
+    rhyme_scheme VARCHAR(255),
+    poem_type    VARCHAR(255),
+    CONSTRAINT pk_poem PRIMARY KEY (id),
+    CONSTRAINT FK_POEM_ON_ID FOREIGN KEY (id) REFERENCES obras (id)
+);
 CREATE TABLE public.short_story
 (
     "content" text NULL,
@@ -189,7 +198,7 @@ VALUES ('e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf', 'aluno1@teste.com', 'aluno1',
 -- Aluno 1: e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf
 -- Aluno 2: eca64533-6dbd-465b-863c-bb540fecdc61
 -- Aluno 3: 4c9f354b-0780-4cdb-b76f-d43e54ea3644
--- Professor: 455150bd-8e40-498c-8005-cca9cefa909
+-- Professor: 455150bd-8e40-498c-8005-cca9cefa9099
 -- ========================================================
 
 
@@ -300,6 +309,34 @@ VALUES
      'LibraLiterature',
      '1º A'),
 
+
+    (
+        'a53b53f2-892b-4d92-990a-160103759392',
+        'A Janela Azul',
+        'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
+        '2023-11-21',
+        'Crônica sobre memória afetiva e o olhar de infância através de uma janela.',
+        'Poem',
+        '1º A'
+    ),
+    (
+        '14e08287-c46b-4e67-8984-484c98a58797',
+        'O Canto da Correnteza',
+        'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
+        '2026-05-01',
+        'Sobre a fluidez do tempo e as águas do rio.',
+        'Poem',
+        '3º B'
+    ),
+    (
+        '879652cc-9f37-4d69-b50e-30949d0f39e3',
+        'Arquitetura do Silêncio',
+        'e9f2ed4a-2f1b-462b-82c9-0caa80ea7ebf',
+        '2026-05-01',
+        'Uma reflexão sobre o vazio e a construção dos sonhos.',
+        'Poem',
+        '3º B'
+    ),
     -- Aluno 2 (eca64533-6dbd-465b-863c-bb540fecdc61)
 
     ('44444444-4444-4444-4444-444444444002',
@@ -603,6 +640,30 @@ VALUES ('99999999-9999-9999-9999-999999999001',
         378);
 
 
+-- ============================================================
+-- poemas
+-- ============================================================
+
+INSERT INTO poem (id, content, rhyme_scheme, poem_type)
+VALUES
+    (
+        'a53b53f2-892b-4d92-990a-160103759392',
+        'O vidro reflete o tom do passado,\nNo brilho que o céu resolveu emprestar,\nUm mundo inteiro a se desvendar,\nPor esse retângulo de azul pintado.\n\nNa infância a vida é moldura e luz,\nOnde o horizonte não tem mais barreira,\nA imaginação corre solta e fagueira,\nE o sonho de criança ao azul nos conduz.',
+        'ABBA',
+        'Lírico'
+    ),
+    (
+        '14e08287-c46b-4e67-8984-484c98a58797',
+        'A água caminha macia no leito,\nLevando a folha que o vento derruba,\nEnquanto a mata no canto se aduba,\nO rio descansa dentro do meu peito.\n\nNão há corrente que possa parar,\nO tempo que corre e nunca desiste,\nNa margem do dia que ainda persiste,\nBuscando o caminho pra se encontrar.',
+        'ABBA',
+        'Regionalista'
+    ),
+    (
+        '879652cc-9f37-4d69-b50e-30949d0f39e3',
+        'Erguendo paredes de puro vazio,\nNo vão da saudade que o muro sustenta,\nA alma cansada que a dor afugenta,\nSe abriga do frio no longo estio.\n\nConstruo o abrigo no traço do papel,\nOnde o silêncio é a base de tudo,\nNum mundo que grita, eu permaneço mudo,\nOlhando o desenho que brilha no céu.',
+        'ABBA',
+        'Modernista'
+    );
 
 INSERT INTO book_club (id, book_author, book_name, book_synopses, date, location, organizer_id,book_cover_url)
 VALUES ('11111111-1111-1111-1111-111111111001', 'Jorge Amado', 'Gabriela, Cravo e Canela',

@@ -12,14 +12,14 @@ public record ShortStoryRequestDTO(
         @NotBlank(message = "Title cannot be blank") @Size(min = 3, max = 255, message = "Title must be between 3 and 255 characters")
         String title,
         @Email(message = "Author must be a valid email address") String authorEmail,
-        @Size(min = 3,max = 255) String authorName,
+        @Size(min = 3, max = 255) String authorName,
         @NotNull(message = "Data cannot be empty") @PastOrPresent(message = "Publication date cannot be in the future")
         LocalDateTime publicationDate,
         @NotBlank(message = "description cannot be blank") @Size(min = 15, message = "Description must be at least 15 characters long")
         String description,
         @NotBlank(message = "Content can not be blank") //Veriicar dps se coloca minimo e maximo de caracteres
         String content,
-        @NotBlank@Size(min = 3,max = 50,message = "Student class must be between 3 and 50 characters")
+        @NotBlank @Size(min = 3, max = 50, message = "Student class must be between 3 and 50 characters")
         String studentClass
 ) implements WorkRequest {
 }

@@ -5,7 +5,7 @@ info:
 
 http:
   method: POST
-  url: "{{api_url}}bookclub/{{bookclub_id}}/comments"
+  url: "{{api_url}}bookclub/{{bookclub_id}}/reviews"
   body:
     type: json
     data: |-

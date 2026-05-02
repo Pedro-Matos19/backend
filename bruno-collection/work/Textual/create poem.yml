@@ -1,0 +1,28 @@
+info:
+  name: create poem
+  type: http
+  seq: 6
+
+http:
+  method: POST
+  url: "{{api_url}}work/poems"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "O Guardião do Cristal Verde",
+        "authorName": "ana",
+        "publicationDate": "2026-05-01T12:45:00",
+        "description": "Poema sobre o equilíbrio entre o progresso humano e a alma da floresta.",
+        "content": "A mata respira em verde profundo,\nOnde o bicho esconde o rastro do pé,\nProtegem as águas com braços de fé,\nLonge do ruído e do mal do mundo.\n\nChegou o progresso com ferro e trator,\nRasgando o silêncio da terra sagrada,\nDeixando a semente no chão sufocada,\nTrocando a vida por ouro e valor.\n\nMas veio o trovão em voz de aviso,\nQue a terra cansada não pode aguentar,\nO rio que seca parou de cantar,\nPerdendo a beleza do seu paraíso.\n\nSó resta o cuidado na palma da mão,\nPlantando o futuro pra não ver o fim,\nZelando a floresta no nosso jardim,\nPra que o amanhã não seja em vão.",
+        "rhymeScheme": "ABBA",
+        "poemType": "Lírico-Narrativo",
+        "studentClass": "Terceiro B"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

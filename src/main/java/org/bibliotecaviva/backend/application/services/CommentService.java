@@ -3,6 +3,7 @@ package org.bibliotecaviva.backend.application.services;
 import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Comment;
 import org.bibliotecaviva.backend.domain.entities.projections.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.User;
@@ -51,7 +52,7 @@ public class CommentService {
                 .map(this::toDTO);
     }
 
-    public Page<CommentSummaryResponseDTO> getAll(Pageable pageable){
+    public Page<CommentSummaryResponseDTO> getAll(Pageable pageable){ // todo: ta extourando n+1 dps corrijo
         return commentRepository.findAllWithUserAndWork(pageable)
                 .map(this::toSummaryDTO);
     }
@@ -77,11 +78,11 @@ public class CommentService {
         
         boolean isOwner = comment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole() == Role.ADMIN;
-        
+
         if(!isOwner && !isAdmin) {
             throw new AccessDeniedException("Você não pode deletar este comentário");
         }
-        commentRepository.deleteById(commentId);
+        commentRepository.delete(comment);
     }
 
     //usar filtrando já por work
@@ -90,7 +91,8 @@ public class CommentService {
                 comment.getId(),
                 comment.getContent(),
                 comment.getUser().getName(),
-                comment.getCreatedAt()
+                comment.getCreatedAt(),
+                commentRepository.getLikeCount(comment.getId())
         );
     }
     //somente pra dashboard
@@ -108,5 +110,19 @@ public class CommentService {
 
     public Long countComments(){
         return commentRepository.count();
+    }
+
+    @Transactional
+    public LikeResponseDTO like(UUID id, User user) {
+        commentRepository.likeComment(user.getId(), id);
+        long likeCount = commentRepository.getLikeCount(id);
+        return new LikeResponseDTO(true, likeCount);
+    }
+
+    @Transactional
+    public LikeResponseDTO unLike(UUID id, User user) {
+        commentRepository.unlikeComment(user.getId(), id);
+        long likeCount = commentRepository.getLikeCount(id);
+        return new LikeResponseDTO(false, likeCount);
     }
 }

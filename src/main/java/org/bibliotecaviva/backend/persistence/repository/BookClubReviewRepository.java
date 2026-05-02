@@ -1,6 +1,5 @@
 package org.bibliotecaviva.backend.persistence.repository;
 
-import org.bibliotecaviva.backend.application.services.ReviewSummaryResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.BookClubReview;
 import org.bibliotecaviva.backend.domain.entities.projections.ReviewSummary;
 import org.springframework.data.domain.Page;
@@ -9,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -20,4 +20,6 @@ public interface BookClubReviewRepository extends JpaRepository<BookClubReview, 
             "b.bookName AS bookClubTitle,b.id as bookClubId " +
             "FROM BookClubReview r JOIN r.user u JOIN r.bookClub b")
     Page<ReviewSummary> findAllWithUserAndBookClub(Pageable pageable);
+
+    Optional<BookClubReview> findByIdAndBookClub_Id(UUID id, UUID bookClubId);
 }

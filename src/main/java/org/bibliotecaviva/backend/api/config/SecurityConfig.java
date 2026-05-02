@@ -24,6 +24,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
+import java.util.Set;
 
 @Configuration
 @EnableWebSecurity
@@ -34,38 +35,50 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     @Value("${security.cors.allowed-origins}")
     private List<String> allowedOrigins;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+
+                        //Admin-only
                         .requestMatchers("/admin/**").hasRole("ADMIN")
+                        //------------------------------------------------------------------------------------
+
+                        //BookClubs and Reviews
+                        .requestMatchers((HttpMethod.GET),"/bookclub/*/reviews/**").permitAll()
+                        .requestMatchers((HttpMethod.POST),"/bookclub/*/reviews/*").authenticated()
+                        .requestMatchers((HttpMethod.PUT),"/bookclub/*/reviews/*").authenticated()
+                        .requestMatchers((HttpMethod.DELETE),"/bookclub/*/reviews/*").authenticated()
 
                         .requestMatchers(HttpMethod.POST, "/bookclub/*/subscribe", "/bookclub/*/unsubscribe")
                         .authenticated()
 
-                        .requestMatchers(HttpMethod.POST, "/bookclub/*").hasAnyRole("ADMIN","CURADOR")
-                        .requestMatchers(HttpMethod.PUT, "/bookclub/*").hasAnyRole("ADMIN","CURADOR")
-                        .requestMatchers(HttpMethod.DELETE, "/bookclub/*").hasAnyRole("ADMIN","CURADOR")
+                        .requestMatchers(HttpMethod.GET, "/bookclub/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/bookclub/*").hasAnyRole("ADMIN", "CURADOR")
+                        .requestMatchers(HttpMethod.PUT, "/bookclub/*").hasAnyRole("ADMIN", "CURADOR")
+                        .requestMatchers(HttpMethod.DELETE, "/bookclub/*").hasAnyRole("ADMIN", "CURADOR")
+                        //------------------------------------------------------------------------------------
 
-                        .requestMatchers(HttpMethod.PUT, "/work/*/comments/*").hasAnyRole("ADMIN", "CURADOR", "ALUNO")
-                        .requestMatchers(HttpMethod.DELETE, "/work/*/comments/*")
-                        .hasAnyRole("ADMIN", "CURADOR", "ALUNO")
-
-                        .requestMatchers(HttpMethod.POST, "/work/*/comments").hasAnyRole("ALUNO", "CURADOR", "ADMIN")
+                        //Works,Comments and likes
                         .requestMatchers(HttpMethod.GET, "/work/liked").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/work/*/like").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/work/*/like").authenticated()
 
+                        .requestMatchers(HttpMethod.POST, "/work/*/comments").hasAnyRole("ALUNO", "CURADOR", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/work/*/comments/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/work/*/comments/*").authenticated()
+
+
                         .requestMatchers(HttpMethod.POST, "/work/**").hasAnyRole("ADMIN", "CURADOR")
                         .requestMatchers(HttpMethod.PUT, "/work/**").hasAnyRole("ADMIN", "CURADOR")
                         .requestMatchers(HttpMethod.DELETE, "/work/**").hasAnyRole("ADMIN", "CURADOR")
-
                         .requestMatchers(HttpMethod.GET, "/work/**").permitAll()
 
-                        .requestMatchers("/auth/login", "/auth/register", "/auth/logout", "/swagger-ui/**",
-                                "/scalar/**", "/v3/api-docs/**")
-                        .permitAll()
+                        .requestMatchers("/auth/login", "/auth/register", "/auth/logout",
+                                         "/swagger-ui/**", "/scalar/**", "/v3/api-docs/**").permitAll()
+
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))

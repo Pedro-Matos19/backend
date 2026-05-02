@@ -18,9 +18,6 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByEmail(String email);
 
     //todo: se like virar classe criar um like repository
-    @Query(value = "SELECT COUNT(*) > 0 FROM likes WHERE user_id = :userId AND work_id = :workId", nativeQuery = true)
-    boolean existsLike(@Param("userId") UUID userId, @Param("workId") UUID workId);
-
     @Query(value = "SELECT work_id FROM likes WHERE user_id = :userId", nativeQuery = true)
     List<UUID> findLikedWorkIdsByUserId(@Param("userId") UUID userId);
 

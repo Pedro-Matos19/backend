@@ -12,7 +12,10 @@ import org.bibliotecaviva.backend.application.dtos.response.RegisterResponseDTO;
 import org.bibliotecaviva.backend.application.services.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
@@ -24,6 +27,7 @@ public class AuthController {
     // mudar para cookies e validar refresh no banco.
 
     private final AuthService authService;
+
     @PostMapping("/login")
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Credenciais Inválidas", content = @Content)

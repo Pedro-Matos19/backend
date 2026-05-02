@@ -1,4 +1,4 @@
-package org.bibliotecaviva.backend.application.services;
+package org.bibliotecaviva.backend.application.dtos.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

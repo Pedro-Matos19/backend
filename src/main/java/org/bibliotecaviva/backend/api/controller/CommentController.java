@@ -1,5 +1,6 @@
 package org.bibliotecaviva.backend.api.controller;
 
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
@@ -7,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.request.CommentRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.application.services.CommentService;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.springframework.data.domain.Page;
@@ -73,4 +75,23 @@ public class CommentController {
         commentService.delete(commentId, user);
         return ResponseEntity.noContent().build();
     }
+
+    @PutMapping("/{commentId}/like")
+    @ApiResponse(responseCode = "200", content = @Content, description = "Liked")
+    @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
+    @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
+    public ResponseEntity<LikeResponseDTO> likeComment(@PathVariable UUID commentId,
+                                                    @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(commentService.like(commentId, user));
+    }
+
+    @DeleteMapping("/{commentId}/like")
+    @ApiResponse(responseCode = "200", content = @Content, description = "UnLiked")
+    @ApiResponse(responseCode = "404", content = @Content, description = "Not Found")
+    @ApiResponse(responseCode = "400", content = @Content, description = "Invalid ID")
+    public ResponseEntity<LikeResponseDTO> unLike(@PathVariable UUID commentId,
+                                                  @AuthenticationPrincipal User user) {
+        return ResponseEntity.ok(commentService.unLike(commentId, user));
+    }
+
 }

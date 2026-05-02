@@ -19,7 +19,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,7 +36,7 @@ public class BookClubController {
     @PreAuthorize("hasAnyRole('ADMIN', 'CURADOR')")
     public ResponseEntity<BookClubResponseDTO> create(@RequestBody @Valid BookClubRequestDTO requestDTO,
                                                       @AuthenticationPrincipal User user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(bookClubService.create(requestDTO,user));
+        return ResponseEntity.status(HttpStatus.CREATED).body(bookClubService.create(requestDTO, user));
     }
 
     @GetMapping("/next")
@@ -49,9 +48,10 @@ public class BookClubController {
     //      se for varios, vai ter que ter um getByMonth ou algo do tipo, ou deixar como ta e sempre aparecer os proximos
     @GetMapping
     public ResponseEntity<Page<BookClubResponseDTO>> getAll(
-            @Parameter(hidden = true) @PageableDefault( sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
+            @Parameter(hidden = true) @PageableDefault(sort = "date", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(bookClubService.getAll(pageable));
     }
+
     @GetMapping("/{id}")
     public ResponseEntity<BookClubResponseDTO> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(bookClubService.getById(id));

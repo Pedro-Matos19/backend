@@ -51,8 +51,6 @@ public class BookClubService {
     }
 
     public Page<BookClubResponseDTO> getAll(Pageable pageable) {
-        var teste = bookClubRepository.findAllWithParticipantCountAndAverageRating(pageable);
-        System.out.println(teste);
         return bookClubRepository.findAllWithParticipantCountAndAverageRating(pageable)
                 .map(club -> bookClubMapper.toDto((BookClub) club[0], (Long) club[1],BigDecimal.valueOf((Double) club[2]).setScale(2, RoundingMode.HALF_UP))
                 );

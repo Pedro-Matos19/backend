@@ -5,7 +5,9 @@ import org.bibliotecaviva.backend.domain.entities.projections.CommentSummary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.UUID;
 
@@ -19,4 +21,17 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
             "w.title AS workTitle,w.id as workId " +
             "FROM Comment c JOIN c.user u JOIN c.work w")
     Page<CommentSummary> findAllWithUserAndWork(Pageable pageable);
+
+    @Modifying
+    @Query(value = "INSERT INTO comment_likes (user_id,comment_id) VALUES (:userId, :commentId) ON CONFLICT (user_id, comment_id) DO NOTHING", nativeQuery = true)
+    void likeComment(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
+
+    @Modifying
+    @Query(value = "DELETE FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
+    void unlikeComment(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
+
+    @Query(value = "SELECT COUNT(*) FROM comment_likes WHERE comment_id = :commentId", nativeQuery = true)
+    long getLikeCount(@Param("commentId") UUID commentId);
+
+
 }

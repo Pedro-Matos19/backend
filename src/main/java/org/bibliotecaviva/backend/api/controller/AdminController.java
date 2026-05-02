@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.AdminDashboardResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.UserResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.ReviewSummaryResponseDTO;
 import org.bibliotecaviva.backend.application.services.*;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.springframework.data.domain.Page;
@@ -77,14 +78,14 @@ public class AdminController {
     @GetMapping("/comments")
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponse(responseCode = "200", description = "Comments retrieved successfully")
-    public ResponseEntity<Page<CommentSummaryResponseDTO>> getAllComments(@PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<CommentSummaryResponseDTO>> getAllComments(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(commentService.getAll(pageable));
     }
 
     @GetMapping("/reviews")
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponse(responseCode = "200", description = "BookClub reviews retrieved successfully")
-    public ResponseEntity<Page<ReviewSummaryResponseDTO>> getAllReviews(@PageableDefault(sort = "createdAt",direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<Page<ReviewSummaryResponseDTO>> getAllReviews(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(bookClubReviewService.getAll(pageable));
     }
 

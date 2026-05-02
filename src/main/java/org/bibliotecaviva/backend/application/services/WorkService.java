@@ -23,7 +23,6 @@ import org.bibliotecaviva.backend.domain.entities.visual.Art;
 import org.bibliotecaviva.backend.domain.entities.visual.Infographic;
 import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
-import org.bibliotecaviva.backend.domain.exceptions.WorkAlreadyExistsException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
 import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
 import org.bibliotecaviva.backend.persistence.repository.UserRepository;
@@ -87,6 +86,7 @@ public class WorkService {
             case InfographicRequestDTO d -> workMapper.toEntity(d);
             case MultimediaRequestDTO d -> workMapper.toEntity(d);
             case LibraLiteratureRequestDTO d -> workMapper.toEntity(d);
+            case PoemRequestDTO d -> workMapper.toEntity(d);
             default -> throw new IllegalArgumentException(
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         };
@@ -97,11 +97,11 @@ public class WorkService {
         }
 
         if (dto.authorEmail() != null && dto.authorName() == null) {
-           var user = userRepository.findByEmail(dto.authorEmail())
+            var user = userRepository.findByEmail(dto.authorEmail())
                     .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.authorEmail()));
             work.setAuthor(user);
         } else {
-           work.setAuthorName(dto.authorName());
+            work.setAuthorName(dto.authorName());
         }
         work.setViewCount(0L);
 
@@ -126,6 +126,7 @@ public class WorkService {
             case InfographicRequestDTO d -> workMapper.partialUpdate(d, (Infographic) work);
             case MultimediaRequestDTO d -> workMapper.partialUpdate(d, (Multimedia) work);
             case LibraLiteratureRequestDTO d -> workMapper.partialUpdate(d, (LibraLiterature) work);
+            case PoemRequestDTO d -> workMapper.partialUpdate(d, (Poem) work);
             default -> throw new IllegalArgumentException(
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         }
@@ -134,9 +135,12 @@ public class WorkService {
             var user = userRepository.findByEmail(dto.authorEmail())
                     .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.authorEmail()));
             work.setAuthor(user);
+            work.setAuthorName(null);
         } else {
             work.setAuthorName(dto.authorName());
+            work.setAuthor(null);
         }
+
         if (work instanceof Cordel) {
             var arte = (Art) workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
                     .orElseThrow(() -> new WorkNotFoundException("Obra de arte com nome " + ((CordelRequestDTO) dto).artName() + " não encontrada"));
@@ -202,6 +206,7 @@ public class WorkService {
                 counts.getOrDefault("Tale", 0L).intValue(),
                 counts.getOrDefault("Art", 0L).intValue(),
                 counts.getOrDefault("Infographic", 0L).intValue(),
+                counts.getOrDefault("Poem", 0L).intValue(),
                 works,
                 mostLikes);
     }

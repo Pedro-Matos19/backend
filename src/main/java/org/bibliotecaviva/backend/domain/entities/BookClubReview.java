@@ -33,7 +33,7 @@ public class BookClubReview {
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
-    @Column
+    @Column(nullable = false)
     private BigDecimal rating;
 
     @PrePersist
