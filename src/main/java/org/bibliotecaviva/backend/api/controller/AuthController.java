@@ -12,14 +12,20 @@ import org.bibliotecaviva.backend.application.dtos.response.RegisterResponseDTO;
 import org.bibliotecaviva.backend.application.services.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication", description = "Controller responsible for handling authentication-related operations such as login, registration, and logout.")
 public class AuthController {
-    // mudar se tiver usando cookies no front
+
+    //todo: password reset,forgot-password and refresh-token,
+    // mudar para cookies e validar refresh no banco.
+
     private final AuthService authService;
 
     @PostMapping("/login")
@@ -37,13 +43,11 @@ public class AuthController {
     }
 
     @ApiResponse(responseCode = "401", description = "No token to remove or invalid token.", content = @Content)
+    @ApiResponse(responseCode = "204", description = "No valid token to remove.", content = @Content)
     @Operation(description = "Add token to blacklist, remove after expire")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-            authService.invalidateToken(token);
-        }
+    public ResponseEntity<Void> logout() {
         return ResponseEntity.noContent().build();
     }
+
 }

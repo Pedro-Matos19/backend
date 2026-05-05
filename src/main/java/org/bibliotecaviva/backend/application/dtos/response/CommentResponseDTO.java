@@ -7,6 +7,7 @@ public record CommentResponseDTO(
         UUID id,
         String content,
         String authorName,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long likes
 ) {
 }

@@ -12,12 +12,11 @@ import org.bibliotecaviva.backend.application.dtos.response.audiovisual.LibraLit
 import org.bibliotecaviva.backend.application.dtos.response.audiovisual.MultimediaResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.textual.*;
 import org.bibliotecaviva.backend.application.dtos.response.visual.ArtResponseDTO;
-import org.bibliotecaviva.backend.application.dtos.response.visual.InfographicReponseDTO;
-import org.bibliotecaviva.backend.domain.entities.User;
+import org.bibliotecaviva.backend.application.dtos.response.visual.InfographicResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Work;
-import org.bibliotecaviva.backend.domain.entities.WorkSummary;
 import org.bibliotecaviva.backend.domain.entities.audiovisual.LibraLiterature;
 import org.bibliotecaviva.backend.domain.entities.audiovisual.Multimedia;
+import org.bibliotecaviva.backend.domain.entities.projections.WorkSummary;
 import org.bibliotecaviva.backend.domain.entities.textual.*;
 import org.bibliotecaviva.backend.domain.entities.visual.Art;
 import org.bibliotecaviva.backend.domain.entities.visual.Infographic;
@@ -29,51 +28,60 @@ import java.time.Duration;
 public interface WorkMapper {
 
 
-
-    default WorkResponse toDTO(Work work, Long likeCount,Long commentCount) {
+    default WorkResponse toDTO(Work work, Long likeCount, Long commentCount) {
         return switch (work) {
-            case LibraLiterature w -> toLibraLiteratureResponseDTO(w, likeCount,commentCount);
-            case Multimedia w -> toMultimediaResponseDTO(w, likeCount,commentCount);
-            case Article w -> toArticleResponseDTO(w, likeCount,commentCount);
-            case Cordel w -> toCordelResponseDTO(w, likeCount,commentCount);
-            case Essay w -> toEssayResponseDTO(w, likeCount,commentCount);
-            case ShortStory w -> toShortStoryResponseDTO(w, likeCount,commentCount);
-            case Tale w -> toTaleResponseDTO(w, likeCount,commentCount);
-            case Art w -> toArtResponseDTO(w, likeCount,commentCount);
-            case Infographic w -> toInfographicReponseDTO(w, likeCount,commentCount);
+            case LibraLiterature w -> toLibraLiteratureResponseDTO(w, likeCount, commentCount);
+            case Multimedia w -> toMultimediaResponseDTO(w, likeCount, commentCount);
+            case Article w -> toArticleResponseDTO(w, likeCount, commentCount);
+            case Cordel w -> toCordelResponseDTO(w, likeCount, commentCount);
+            case Essay w -> toEssayResponseDTO(w, likeCount, commentCount);
+            case ShortStory w -> toShortStoryResponseDTO(w, likeCount, commentCount);
+            case Tale w -> toTaleResponseDTO(w, likeCount, commentCount);
+            case Art w -> toArtResponseDTO(w, likeCount, commentCount);
+            case Infographic w -> toInfographicReponseDTO(w, likeCount, commentCount);
+            case Poem w -> toPoemResponseDTO(w,likeCount,commentCount);
             default -> throw new IllegalStateException("Unexpected value: " + work);
         };
     }
 
-    default String map(User user) {
-        return user.getName();
-    }
-
     default Duration map(Long value) {
         return value == null ? null : Duration.ofSeconds(value);
-
     }
+
     // mapeamento pra work summary
     WorkSummaryResponseDTO toWorkSummary(WorkSummary work);
 
     // mapeamentos específicos de cada entidade
-    LibraLiteratureResponseDTO toLibraLiteratureResponseDTO(LibraLiterature libraLiterature, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(libraLiterature.resolveAuthorName())")
+    LibraLiteratureResponseDTO toLibraLiteratureResponseDTO(LibraLiterature libraLiterature, Long likeCount, Long commentCount);
 
-    MultimediaResponseDTO toMultimediaResponseDTO(Multimedia Multimedia, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(multimedia.resolveAuthorName())")
+    MultimediaResponseDTO toMultimediaResponseDTO(Multimedia multimedia, Long likeCount, Long commentCount);
 
-    ArticleResponseDTO toArticleResponseDTO(Article article, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(article.resolveAuthorName())")
+    ArticleResponseDTO toArticleResponseDTO(Article article, Long likeCount, Long commentCount);
 
-    CordelResponseDTO toCordelResponseDTO(Cordel cordel, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(poem.resolveAuthorName())")
+    ArticleResponseDTO toPoemResponseDTO(Poem poem, Long likeCount, Long commentCount);
 
-    EssayResponseDTO toEssayResponseDTO(Essay essay, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(cordel.resolveAuthorName())")
+    @Mapping(target = "url", source = "cordel.illustration.url")
+    CordelResponseDTO toCordelResponseDTO(Cordel cordel, Long likeCount, Long commentCount);
 
-    ShortStoryResponseDTO toShortStoryResponseDTO(ShortStory shortStory, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(essay.resolveAuthorName())")
+    EssayResponseDTO toEssayResponseDTO(Essay essay, Long likeCount, Long commentCount);
 
-    TaleResponseDTO toTaleResponseDTO(Tale tale, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(shortStory.resolveAuthorName())")
+    ShortStoryResponseDTO toShortStoryResponseDTO(ShortStory shortStory, Long likeCount, Long commentCount);
 
-    ArtResponseDTO toArtResponseDTO(Art art, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(tale.resolveAuthorName())")
+    TaleResponseDTO toTaleResponseDTO(Tale tale, Long likeCount, Long commentCount);
 
-    InfographicReponseDTO toInfographicReponseDTO(Infographic infographic, Long likeCount,Long commentCount);
+    @Mapping(target = "author", expression = "java(art.resolveAuthorName())")
+    ArtResponseDTO toArtResponseDTO(Art art, Long likeCount, Long commentCount);
+
+    @Mapping(target = "author", expression = "java(infographic.resolveAuthorName())")
+    InfographicResponseDTO toInfographicReponseDTO(Infographic infographic, Long likeCount, Long commentCount);
 
     // daqui pra baixo separar ppor classe do mapper se prcisar, ver depois
     @Mapping(target = "author", ignore = true)
@@ -92,10 +100,16 @@ public interface WorkMapper {
 
     @Mapping(target = "author", ignore = true)
     Article toEntity(ArticleRequestDTO articleRequestDTO);
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "author", ignore = true)
     void partialUpdate(ArticleRequestDTO articleRequestDTO, @MappingTarget Article article);
+
+    @Mapping(target = "author", ignore = true)
+    Poem toEntity(PoemRequestDTO poemRequestDTO);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "author", ignore = true)
+    void partialUpdate(PoemRequestDTO poemRequestDTO, @MappingTarget Poem poem);
 
     @Mapping(target = "author", ignore = true)
     Cordel toEntity(CordelRequestDTO cordelRequestDTO);

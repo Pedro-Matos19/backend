@@ -16,6 +16,9 @@ public record CordelResponseDTO(
         String rhymeScheme,
         Long viewCount,
         Long likeCount,
-        Long commentCount
+        Long commentCount,
+        String url,
+        String studentClass
+
 ) implements WorkResponse {
 }

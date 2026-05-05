@@ -1,18 +1,20 @@
-todo
--
-- [ ] Implementar Notificações
-- [ ] Implementar RefreshToken e esqueceu a senha
-- [ ] Mandar duração no worksummary para audiovisual
-- [ ] Implementar exclusao de conta para admin (?)
-- [ ] Verificar se vai colocar obras favoritadas por usuario
-- [ ] Verificar dados de cadastro.
-- [ ] Verificar se vai ter download, e de que, existe botao no front
-- [ ] Verificar se todas as obras tem imagem associada ou se vai ser placeholder no front
-- [ ] Verificar se precisa mesmo de contador de visualizacao
-- [ ] Clube de leitura
-    - espaço para resenhas [vai ser outro tipo de obra? ou so comentarios?]
-    - verificar se pode ter mais de 1, ou se so um professor pode organizar
-
+Todo-list
+-------------------------------------
+Nao precisa fazer agora:
+- [ ] Notificações (Se precisar)
+- [ ] Fluxo com refreshToken e acessToken (Fazer em conjunto com front, e trocar por cookies)
+- [ ] Esqueceu a senha
+-------------------------------------
+- [ ] Slug pra navegação pra perfil do usuário(precisa se ofr ter navegacao) e pra obras (mais legivel, porem desncessário)
+- [ ] Mandar duração no worksummary (se n der pra pegar direto no front)
+- [ ] admin,professor e autor da obra podem responder comentários
+- [ ] Colocar novo tipo de obra(poemas)
+__________________________
+- [ ] Testes
+    - Testes unitários
+    - Testes de integração
+    - Testes de interface (end-to-end)
+------------------
 # Sessões do Site
 
 | Seção                      | Descrição                                                                                                                                                                                        | 

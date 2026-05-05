@@ -1,14 +1,14 @@
 info:
   name: GetAll
   type: http
-  seq: 3
+  seq: 2
 
 http:
   method: GET
-  url: "{{api_url}}work?type=infographic"
+  url: "{{api_url}}work?type="
   params:
     - name: type
-      value: infographic
+      value: ""
       type: query
   auth: inherit
 

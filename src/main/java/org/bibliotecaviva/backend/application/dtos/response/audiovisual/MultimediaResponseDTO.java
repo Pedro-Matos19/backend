@@ -17,7 +17,8 @@ public record MultimediaResponseDTO(
         Long viewCount,
         Long likeCount,
         Long commentCount,
-        Duration duration
+        Duration duration,
+        String studentClass
 
 
 ) implements WorkResponse {

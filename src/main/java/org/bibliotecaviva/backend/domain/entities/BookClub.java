@@ -23,9 +23,10 @@ public class BookClub {
     @Column(columnDefinition = "TEXT")
     private String bookSynopses;
     private String bookAuthor;
-    // private String bookCoverUrl;
     private LocalDateTime date;
-    private String location;
+    @Column(columnDefinition = "TEXT")
+    private String bookCoverUrl;
+    private String location; // Deixar por enquanto mas ta hardcordado na biblioteca
     @ManyToOne
     @JoinColumn(name = "organizer_id")
     private User organizer;
@@ -36,6 +37,9 @@ public class BookClub {
             inverseJoinColumns = @JoinColumn(name = "users_id")
     )
     private Set<User> participants = new HashSet<>();
+
+    @OneToMany(mappedBy = "bookClub", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookClubReview> reviews;
     //pode associar resenhas relacionadas caso sejam obras autorais como as outras. ai filtra depois as resenhas
     //pelo nome do livro
 }

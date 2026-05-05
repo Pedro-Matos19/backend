@@ -1,12 +1,17 @@
 info:
   name: deleteWork
   type: http
-  seq: 9
+  seq: 7
 
 http:
   method: DELETE
   url: "{{api_url}}work/{{id}}"
   auth: inherit
+
+runtime:
+  variables:
+    - name: id
+      value: 14e08287-c46b-4e67-8984-484c98a58797
 
 settings:
   encodeUrl: true

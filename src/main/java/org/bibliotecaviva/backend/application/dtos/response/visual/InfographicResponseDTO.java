@@ -5,7 +5,7 @@ import org.bibliotecaviva.backend.application.dtos.response.WorkResponse;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record InfographicReponseDTO(
+public record InfographicResponseDTO(
         UUID id,
         String title,
         String author,
@@ -15,6 +15,8 @@ public record InfographicReponseDTO(
         String url,
         Long viewCount,
         Long likeCount,
-        Long commentCount
+        Long commentCount,
+        String studentClass
+
 ) implements WorkResponse {
 }

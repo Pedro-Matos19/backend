@@ -6,6 +6,8 @@ import org.bibliotecaviva.backend.domain.entities.BookClub;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.mapstruct.*;
 
+import java.math.BigDecimal;
+
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = MappingConstants.ComponentModel.SPRING)
 public interface BookClubMapper {
     @Mapping(target = "organizer", source = "organizer")
@@ -13,8 +15,9 @@ public interface BookClubMapper {
     BookClub toEntity(BookClubRequestDTO bookClubRequestDTO, User organizer);
 
 
-    @Mapping(target = "organizerId", source = "bookClub.organizer")
-    BookClubResponseDTO toDto(BookClub bookClub, Long participantsCount);
+    @Mapping(target = "organizerName", source = "bookClub.organizer.name")
+    @Mapping(target = "averageRating", source = "averageRating")
+    BookClubResponseDTO toDto(BookClub bookClub, Long participantsCount, BigDecimal averageRating);
 
     default String map(User user) {
         return user != null ? user.getId().toString() : null;

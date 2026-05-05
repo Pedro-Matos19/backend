@@ -3,13 +3,14 @@ package org.bibliotecaviva.backend.application.services;
 import lombok.RequiredArgsConstructor;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
+import org.bibliotecaviva.backend.application.dtos.response.LikeResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Comment;
-import org.bibliotecaviva.backend.domain.entities.CommentSummary;
+import org.bibliotecaviva.backend.domain.entities.projections.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.exceptions.CommentNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
-import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
-import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,8 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final WorkRepository workRepository;
 
-    //todo (?):  impedir comntario duplicado ou limitar  2 ou 3 igual pra impedir spam?
-    // ver se é necessário, n precisa fzer agora
+    //todo: Verificar spam, criar algo que não permita
+
     @Transactional
     public CommentResponseDTO create(UUID workId, String content, User user) {
         var work = workRepository.findById(workId)
@@ -51,19 +52,20 @@ public class CommentService {
                 .map(this::toDTO);
     }
 
-    public Page<CommentSummaryResponseDTO> getAll(Pageable pageable){
+    public Page<CommentSummaryResponseDTO> getAll(Pageable pageable){ // todo: ta extourando n+1 dps corrijo
         return commentRepository.findAllWithUserAndWork(pageable)
                 .map(this::toSummaryDTO);
     }
     @Transactional
-    public CommentResponseDTO update(UUID commentId, UUID userId, String content) {
+    public CommentResponseDTO update(UUID commentId, User user, String content) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new CommentNotFoundException("Comentário com id " + commentId + " não encontrado"));
-        
-        if(!comment.getUser().getId().equals(userId)) {
+
+        boolean isOwner = comment.getUser().getId().equals(user.getId());
+        boolean isAdmin = user.getRole() == Role.ADMIN;
+        if(!isOwner && !isAdmin) {
             throw new AccessDeniedException("Você não pode editar este comentário");
         }
-        
         comment.setContent(content);
         return toDTO(commentRepository.save(comment));
     }
@@ -76,35 +78,51 @@ public class CommentService {
         
         boolean isOwner = comment.getUser().getId().equals(user.getId());
         boolean isAdmin = user.getRole() == Role.ADMIN;
-        
+
         if(!isOwner && !isAdmin) {
             throw new AccessDeniedException("Você não pode deletar este comentário");
         }
-        
-        commentRepository.deleteById(commentId);
+        commentRepository.delete(comment);
     }
 
+    //usar filtrando já por work
     private CommentResponseDTO toDTO(Comment comment) {
         return new CommentResponseDTO(
                 comment.getId(),
                 comment.getContent(),
                 comment.getUser().getName(),
-                comment.getCreatedAt()
-              //  comment.getWork().getTitle()
+                comment.getCreatedAt(),
+                commentRepository.getLikeCount(comment.getId())
         );
     }
-
+    //somente pra dashboard
     private CommentSummaryResponseDTO toSummaryDTO(CommentSummary comment) {
         return new CommentSummaryResponseDTO(
                 comment.getId(),
                 comment.getContent(),
                 comment.getUserName(),
+                comment.getUserId(),
                 comment.getWorkTitle(),
+                comment.getWorkId(),
                 comment.getCreatedAt()
         );
     }
 
     public Long countComments(){
         return commentRepository.count();
+    }
+
+    @Transactional
+    public LikeResponseDTO like(UUID id, User user) {
+        commentRepository.likeComment(user.getId(), id);
+        long likeCount = commentRepository.getLikeCount(id);
+        return new LikeResponseDTO(true, likeCount);
+    }
+
+    @Transactional
+    public LikeResponseDTO unLike(UUID id, User user) {
+        commentRepository.unlikeComment(user.getId(), id);
+        long likeCount = commentRepository.getLikeCount(id);
+        return new LikeResponseDTO(false, likeCount);
     }
 }
