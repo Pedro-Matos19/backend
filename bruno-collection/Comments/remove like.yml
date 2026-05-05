@@ -18,3 +18,17 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Unlike Comment
+
+  Remove a curtida do comentario para o usuario autenticado.
+
+  ## Comportamento
+  - Requer `Authorization: Bearer <token>`.
+  - A resposta retorna `liked: false` e o `likeCount` atual.
+
+  ## Respostas esperadas
+  - `200`: curtida removida.
+  - `401`: usuario nao autenticado.
+  - `404`: comentario nao encontrado.

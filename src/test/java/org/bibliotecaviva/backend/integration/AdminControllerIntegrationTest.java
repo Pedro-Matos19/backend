@@ -1,11 +1,20 @@
 package org.bibliotecaviva.backend.integration;
 
+import org.bibliotecaviva.backend.domain.entities.BookClub;
+import org.bibliotecaviva.backend.domain.entities.BookClubReview;
+import org.bibliotecaviva.backend.domain.entities.Comment;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.entities.textual.Article;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.junit.jupiter.api.Test;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -51,6 +60,46 @@ class AdminControllerIntegrationTest extends IntegrationTestSupport {
                 .andExpect(status().isNoContent());
         flushAndClear();
         assertEquals(Status.BLOCKED, userRepository.findById(blockTarget.getId()).orElseThrow().getAccountStatus());
+    }
+
+    @Test
+    void adminShouldPermanentlyDeleteUserAndClearRelationships() throws Exception {
+        User admin = createActiveAdmin();
+        User target = createActiveCurator();
+        User student = createActiveStudent();
+        Article authoredWork = createArticleInDatabase(target, uniqueTitle("Obra autoral"));
+        Article likedWork = createArticleInDatabase(admin, uniqueTitle("Obra curtida"));
+        Comment targetComment = createCommentInDatabase(target, likedWork, "Comentario do usuario removido");
+        Comment otherComment = createCommentInDatabase(student, likedWork, "Comentario de outro usuario");
+        BookClub bookClub = createBookClubInDatabase(target, LocalDateTime.now().plusMonths(1));
+        bookClub.getParticipants().add(target);
+        bookClubRepository.saveAndFlush(bookClub);
+        BookClubReview review = createBookClubReviewInDatabase(
+                target,
+                bookClub,
+                "Resenha do usuario removido",
+                BigDecimal.valueOf(4));
+        userRepository.likeWork(target.getId(), likedWork.getId());
+        commentRepository.likeComment(target.getId(), otherComment.getId());
+        commentRepository.likeComment(student.getId(), targetComment.getId());
+        flushAndClear();
+
+        mockMvc.perform(delete("/admin/users/{id}", target.getId())
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isNoContent());
+        flushAndClear();
+
+        assertTrue(userRepository.findById(target.getId()).isEmpty());
+        var persistedWork = workRepository.findById(authoredWork.getId()).orElseThrow();
+        assertNull(persistedWork.getAuthor());
+        assertEquals(target.getName(), persistedWork.getAuthorName());
+        assertTrue(commentRepository.findById(targetComment.getId()).isEmpty());
+        assertTrue(bookClubReviewRepository.findById(review.getId()).isEmpty());
+        assertEquals(0L, workRepository.getLikeCount(likedWork.getId()));
+        assertEquals(0L, commentRepository.getLikeCount(otherComment.getId()));
+        var persistedClub = bookClubRepository.findById(bookClub.getId()).orElseThrow();
+        assertNull(persistedClub.getOrganizer());
+        assertEquals(0L, bookClubRepository.countParticipants(bookClub.getId()));
     }
 
     @Test

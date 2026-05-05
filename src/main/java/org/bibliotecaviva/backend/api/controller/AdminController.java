@@ -75,6 +75,15 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ApiResponse(responseCode = "204", description = "User permanently deleted successfully")
+    @ApiResponse(responseCode = "404", description = "User Not Found")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
+        userManagementService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/comments")
     @PreAuthorize("hasRole('ADMIN')")
     @ApiResponse(responseCode = "200", description = "Comments retrieved successfully")

@@ -22,12 +22,26 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     List<UUID> findLikedWorkIdsByUserId(@Param("userId") UUID userId);
 
     @Modifying
-    @Query(value = "INSERT INTO likes (user_id, work_id) VALUES (:userId, :workId) ON CONFLICT (user_id, work_id) DO NOTHING", nativeQuery = true)
+    @Query(value = """
+            INSERT INTO likes (user_id, work_id)
+            SELECT :userId, :workId
+            WHERE NOT EXISTS (
+                SELECT 1 FROM likes WHERE user_id = :userId AND work_id = :workId
+            )
+            """, nativeQuery = true)
     void likeWork(@Param("userId") UUID userId, @Param("workId") UUID workId);
 
     @Modifying
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND work_id = :workId", nativeQuery = true)
     void unlikeWork(@Param("userId") UUID userId, @Param("workId") UUID workId);
+
+    @Modifying
+    @Query(value = "DELETE FROM likes WHERE user_id = :userId", nativeQuery = true)
+    void deleteWorkLikesByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query(value = "DELETE FROM comment_likes WHERE user_id = :userId", nativeQuery = true)
+    void deleteCommentLikesByUserId(@Param("userId") UUID userId);
 
     Page<User> findAllByAccountStatus(Status accountStatus, Pageable pageable);
 

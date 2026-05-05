@@ -13,3 +13,18 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Like Work
+
+  Marca a obra como curtida pelo usuario autenticado.
+
+  ## Comportamento
+  - Requer `Authorization: Bearer <token>`.
+  - Curtir a mesma obra mais de uma vez nao duplica o registro e nao deve quebrar.
+  - A resposta retorna `liked: true` e o `likeCount` atual.
+
+  ## Respostas esperadas
+  - `200`: obra curtida ou ja curtida pelo usuario.
+  - `401`: usuario nao autenticado.
+  - `404`: obra nao encontrada.

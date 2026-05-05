@@ -36,6 +36,7 @@ public class BookClub {
             joinColumns = @JoinColumn(name = "book_club_id"),
             inverseJoinColumns = @JoinColumn(name = "users_id")
     )
+    @Builder.Default
     private Set<User> participants = new HashSet<>();
 
     @OneToMany(mappedBy = "bookClub", cascade = CascadeType.REMOVE, orphanRemoval = true)

@@ -10,10 +10,14 @@ import org.bibliotecaviva.backend.application.dtos.request.RegisterRequestDTO;
 import org.bibliotecaviva.backend.application.dtos.response.LoginResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.RegisterResponseDTO;
 import org.bibliotecaviva.backend.application.services.AuthService;
+import org.bibliotecaviva.backend.application.services.JwtService;
+import org.bibliotecaviva.backend.application.services.TokenBlacklistService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,6 +31,8 @@ public class AuthController {
     // mudar para cookies e validar refresh no banco.
 
     private final AuthService authService;
+    private final JwtService jwtService;
+    private final TokenBlacklistService tokenBlacklistService;
 
     @PostMapping("/login")
     @ApiResponse(responseCode = "200", description = "OK")
@@ -46,7 +52,12 @@ public class AuthController {
     @ApiResponse(responseCode = "204", description = "No valid token to remove.", content = @Content)
     @Operation(description = "Add token to blacklist, remove after expire")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String token = authorization.substring(7);
+        tokenBlacklistService.blacklist(token, jwtService.extractExpiration(token));
         return ResponseEntity.noContent().build();
     }
 

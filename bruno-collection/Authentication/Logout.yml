@@ -18,3 +18,15 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Logout
+
+  Invalida o JWT enviado no header `Authorization: Bearer <token>`.
+
+  ## Respostas esperadas
+  - `204`: token valido invalidado com sucesso.
+  - `401`: header ausente, token invalido ou token ja invalidado.
+
+  Depois do logout, o mesmo token deve retornar `401` em rotas protegidas,
+  como `GET /work/liked`.

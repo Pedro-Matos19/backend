@@ -24,3 +24,18 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Create Article
+
+  Cria uma obra do tipo artigo. Requer usuario autenticado com perfil
+  `ADMIN` ou `CURADOR`.
+
+  ## Regras importantes
+  - `authorEmail` deve apontar para um usuario cadastrado.
+  - O mesmo autor nao pode ter duas obras com o mesmo `title`.
+
+  ## Respostas esperadas
+  - `201`: artigo criado.
+  - `404`: autor nao encontrado.
+  - `409`: ja existe obra com o mesmo autor e titulo.

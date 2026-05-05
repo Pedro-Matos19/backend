@@ -9,7 +9,11 @@ import org.bibliotecaviva.backend.domain.exceptions.AccountAlreadyActiveExceptio
 import org.bibliotecaviva.backend.domain.exceptions.AccountAlreadyBlockedException;
 import org.bibliotecaviva.backend.domain.exceptions.AccountNotPendingException;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.BookClubRepository;
+import org.bibliotecaviva.backend.persistence.repository.BookClubReviewRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
+import org.bibliotecaviva.backend.persistence.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -38,6 +42,18 @@ class UserManagementServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private WorkRepository workRepository;
+
+    @Mock
+    private CommentRepository commentRepository;
+
+    @Mock
+    private BookClubRepository bookClubRepository;
+
+    @Mock
+    private BookClubReviewRepository bookClubReviewRepository;
 
     @InjectMocks
     private UserManagementService userManagementService;
@@ -119,6 +135,36 @@ class UserManagementServiceTest {
         assertThrows(AccountAlreadyBlockedException.class, () -> userManagementService.blockUser(id));
 
         verify(userRepository, never()).save(user);
+    }
+
+    @Test
+    void deleteUserShouldClearRelationshipsAndDeleteUser() {
+        UUID id = UUID.randomUUID();
+        User user = buildUser(id, Status.ACTIVE);
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
+
+        userManagementService.deleteUser(id);
+
+        verify(commentRepository).deleteLikesFromCommentsByUserId(id);
+        verify(commentRepository).deleteAllByUserId(id);
+        verify(bookClubReviewRepository).deleteAllByUserId(id);
+        verify(userRepository).deleteCommentLikesByUserId(id);
+        verify(userRepository).deleteWorkLikesByUserId(id);
+        verify(bookClubRepository).deleteParticipantLinksByUserId(id);
+        verify(bookClubRepository).clearOrganizerByUserId(id);
+        verify(workRepository).detachAuthorByUserId(id, user.getName());
+        verify(userRepository).delete(user);
+    }
+
+    @Test
+    void deleteUserShouldFailWhenUserDoesNotExist() {
+        UUID id = UUID.randomUUID();
+        when(userRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> userManagementService.deleteUser(id));
+
+        verify(commentRepository, never()).deleteAllByUserId(org.mockito.ArgumentMatchers.any());
+        verify(userRepository, never()).delete(org.mockito.ArgumentMatchers.any());
     }
 
     @Test

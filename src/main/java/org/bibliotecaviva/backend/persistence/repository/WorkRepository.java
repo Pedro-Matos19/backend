@@ -54,7 +54,7 @@ public interface WorkRepository extends JpaRepository<Work, UUID> {
             nativeQuery = true)
     Page<WorkSummary> findAllSummary(@Param("type") String type, Pageable pageable);
 
-    @Query(value = "SELECT w.type, COUNT(w) FROM obras w GROUP BY w.type",nativeQuery = true)
+    @Query(value = "SELECT w.type, COUNT(*) FROM obras w GROUP BY w.type",nativeQuery = true)
     List<Object[]> countPerType();
 
     @Query(value = """
@@ -110,4 +110,12 @@ public interface WorkRepository extends JpaRepository<Work, UUID> {
 
 
     Optional<Work> findWorkByTitle(String title);
+
+    boolean existsWorkByAuthorAndTitle(User author, String title);
+
+    boolean existsWorkByAuthorNameAndTitle(String authorName, String title);
+
+    @Modifying
+    @Query("UPDATE Work w SET w.authorName = :authorName, w.author = null WHERE w.author.id = :userId")
+    void detachAuthorByUserId(@Param("userId") UUID userId, @Param("authorName") String authorName);
 }
