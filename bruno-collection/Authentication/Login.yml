@@ -26,3 +26,13 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Login
+
+  Autentica um usuario e salva o JWT retornado em `auth_token`.
+
+  ## Respostas esperadas
+  - `200`: credenciais validas e conta ativa. Retorna `token` e `email`.
+  - `401`: email/senha invalidos.
+  - `403`: conta pendente, rejeitada ou desativada.

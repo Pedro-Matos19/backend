@@ -5,3 +5,14 @@ info:
 
 request:
   auth: inherit
+
+docs: |-
+  # Works
+
+  Endpoints de obras.
+
+  ## Regras gerais atualizadas
+  - Criar obra requer usuario `ADMIN` ou `CURADOR`.
+  - O mesmo autor nao pode cadastrar duas obras com o mesmo `title`.
+  - Obra duplicada retorna `409`.
+  - Likes de obras sao idempotentes: repetir o like nao duplica registro.

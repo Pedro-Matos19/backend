@@ -18,3 +18,18 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
+
+docs: |-
+  # Like Comment
+
+  Marca o comentario como curtido pelo usuario autenticado.
+
+  ## Comportamento
+  - Requer `Authorization: Bearer <token>`.
+  - Curtir o mesmo comentario mais de uma vez nao duplica o registro e nao deve quebrar.
+  - A resposta retorna `liked: true` e o `likeCount` atual.
+
+  ## Respostas esperadas
+  - `200`: comentario curtido ou ja curtido pelo usuario.
+  - `401`: usuario nao autenticado.
+  - `404`: comentario nao encontrado.

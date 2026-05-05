@@ -1,0 +1,33 @@
+info:
+  name: deleteUser
+  type: http
+  seq: 8
+
+http:
+  method: DELETE
+  url: "{{api_url}}admin/users/{{id}}"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+docs: |-
+  # Delete User
+
+  Exclui permanentemente a conta informada por `id`.
+
+  ## Regras
+  - Requer token Bearer de usuario `ADMIN`.
+  - Remove o registro do usuario.
+  - Remove comentarios, resenhas de clube do livro, likes e inscricoes do usuario.
+  - Obras publicadas pelo usuario nao sao apagadas; elas ficam com `author` nulo e o nome do usuario preservado como autor textual.
+  - Clubes organizados pelo usuario nao sao apagados; eles ficam sem organizador vinculado.
+
+  ## Respostas esperadas
+  - `204`: usuario excluido com sucesso.
+  - `401`: token ausente ou invalido.
+  - `403`: usuario autenticado nao e admin.
+  - `404`: usuario nao encontrado.

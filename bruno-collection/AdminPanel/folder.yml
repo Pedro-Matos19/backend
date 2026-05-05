@@ -5,3 +5,19 @@ info:
 
 request:
   auth: inherit
+
+docs: |-
+  # Admin Panel
+
+  Endpoints administrativos. Todos herdam o token Bearer da collection e exigem usuario `ADMIN`.
+
+  ## Gestao de usuarios
+  - `GET /admin`: lista usuarios, com filtro opcional por `status`.
+  - `PATCH /admin/approve/{id}`: ativa uma conta.
+  - `PATCH /admin/reject/{id}`: rejeita uma conta pendente.
+  - `PATCH /admin/block/{id}`: bloqueia uma conta.
+  - `DELETE /admin/users/{id}`: exclui permanentemente uma conta.
+
+  A exclusao permanente remove o usuario, seus comentarios, resenhas,
+  likes e inscricoes em clubes. Obras publicadas pelo usuario continuam
+  no catalogo com o nome do autor preservado em texto.
