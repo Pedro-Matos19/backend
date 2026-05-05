@@ -23,7 +23,13 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     Page<CommentSummary> findAllWithUserAndWork(Pageable pageable);
 
     @Modifying
-    @Query(value = "INSERT INTO comment_likes (user_id,comment_id) VALUES (:userId, :commentId) ON CONFLICT (user_id, comment_id) DO NOTHING", nativeQuery = true)
+    @Query(value = """
+            INSERT INTO comment_likes (user_id, comment_id)
+            SELECT :userId, :commentId
+            WHERE NOT EXISTS (
+                SELECT 1 FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId
+            )
+            """, nativeQuery = true)
     void likeComment(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
 
     @Modifying

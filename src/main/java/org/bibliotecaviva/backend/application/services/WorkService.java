@@ -23,6 +23,7 @@ import org.bibliotecaviva.backend.domain.entities.visual.Art;
 import org.bibliotecaviva.backend.domain.entities.visual.Infographic;
 import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
+import org.bibliotecaviva.backend.domain.exceptions.WorkAlreadyExistsException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
 import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
 import org.bibliotecaviva.backend.persistence.repository.UserRepository;
@@ -90,7 +91,7 @@ public class WorkService {
             default -> throw new IllegalArgumentException(
                     "Tipo não mapeado: " + dto.getClass().getSimpleName());
         };
-        if (work instanceof Cordel) {
+        if (work instanceof Cordel && hasText(((CordelRequestDTO) dto).artName())) {
             var arte = (Art) workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
                     .orElseThrow(() -> new WorkNotFoundException("Obra de arte com nome " + ((CordelRequestDTO) dto).artName() + " não encontrada"));
             ((Cordel) work).setIllustration(arte);
@@ -99,16 +100,17 @@ public class WorkService {
         if (dto.authorEmail() != null && dto.authorName() == null) {
             var user = userRepository.findByEmail(dto.authorEmail())
                     .orElseThrow(() -> new UserNotFoundException("Usuário não encontrado com email: " + dto.authorEmail()));
+            if (workRepository.existsWorkByAuthorAndTitle(user, work.getTitle())) {
+                throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
+            }
             work.setAuthor(user);
         } else {
+            if (workRepository.existsWorkByAuthorNameAndTitle(dto.authorName(), work.getTitle())) {
+                throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
+            }
             work.setAuthorName(dto.authorName());
         }
         work.setViewCount(0L);
-
-        // todo: depois faz isso ai, verificar regras de duplicata e ajustar o autor
-//        if (workRepository.existsWorkByAuthorAndTitle(author, work.getTitle())) {
-//            throw new WorkAlreadyExistsException("Obra com mesmo título já existe para este autor");
-//        }
         return workMapper.toDTO(workRepository.save(work), 0L, 0L);
     }
 
@@ -141,7 +143,7 @@ public class WorkService {
             work.setAuthor(null);
         }
 
-        if (work instanceof Cordel) {
+        if (work instanceof Cordel && hasText(((CordelRequestDTO) dto).artName())) {
             var arte = (Art) workRepository.findWorkByTitle(((CordelRequestDTO) dto).artName())
                     .orElseThrow(() -> new WorkNotFoundException("Obra de arte com nome " + ((CordelRequestDTO) dto).artName() + " não encontrada"));
             ((Cordel) work).setIllustration(arte);
@@ -213,5 +215,9 @@ public class WorkService {
 
     public Long countWorks() {
         return workRepository.count();
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

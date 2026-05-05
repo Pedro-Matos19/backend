@@ -35,7 +35,8 @@ public class GlobalExceptionHandler {
             case BadCredentialsException e -> "Credenciais inválidas";
             default -> "Erro de autenticação desconhecido";
         };
-        return build(HttpStatus.UNAUTHORIZED, message, request);
+        HttpStatus status = ex instanceof DisabledException ? HttpStatus.FORBIDDEN : HttpStatus.UNAUTHORIZED;
+        return build(status, message, request);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
