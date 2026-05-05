@@ -8,7 +8,7 @@ import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.enums.Role;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.bibliotecaviva.backend.domain.exceptions.UserAlreadyExistsException;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -45,9 +45,6 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
-
-    @Mock
-    private TokenBlackListService tokenBlacklistService;
 
     @InjectMocks
     private AuthService authService;
@@ -105,13 +102,6 @@ class AuthServiceTest {
 
         verify(passwordEncoder, never()).encode(any());
         verify(userRepository, never()).save(any());
-    }
-
-    @Test
-    void invalidateTokenShouldDelegateToBlacklistService() {
-        authService.invalidateToken("Bearer abc");
-
-        verify(tokenBlacklistService).invalidate("Bearer abc");
     }
 
     private static User buildUser(String name, String email, Role role, Status status) {

@@ -11,8 +11,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
+        type:
+          preferred_uuid_jdbc_type: CHAR
 
 security:
+  cors:
+    allowed-origins: http://localhost:3000
   jwt:
     secret: Y29kZXgtdGVzdC1qd3Qtc2VjcmV0LWZvci1sb2NhbC10ZXN0aW5nLWFwcA==
     expiration: 86400000

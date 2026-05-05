@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class JwtServiceTest {
 
-    private static final String SECRET = "Y29kZXgtdGVzdC1qd3Qtc";
+    private static final String SECRET = "Y29kZXgtdGVzdC1qd3Qtc2VjcmV0LWZvci1qd3Qtc2VydmljZS10ZXN0cw==";
 
     private JwtService jwtService;
 

@@ -3,15 +3,15 @@ package org.bibliotecaviva.backend.application.services;
 import org.bibliotecaviva.backend.application.dtos.response.CommentResponseDTO;
 import org.bibliotecaviva.backend.application.dtos.response.CommentSummaryResponseDTO;
 import org.bibliotecaviva.backend.domain.entities.Comment;
-import org.bibliotecaviva.backend.domain.entities.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.User;
+import org.bibliotecaviva.backend.domain.entities.projections.CommentSummary;
 import org.bibliotecaviva.backend.domain.entities.textual.Article;
 import org.bibliotecaviva.backend.domain.enums.Role;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.bibliotecaviva.backend.domain.exceptions.CommentNotFoundException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
-import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
-import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -151,7 +151,7 @@ class CommentServiceTest {
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
         when(commentRepository.save(comment)).thenReturn(comment);
 
-        CommentResponseDTO response = commentService.update(commentId, user.getId(), "Atualizado");
+        CommentResponseDTO response = commentService.update(commentId, user, "Atualizado");
 
         assertEquals("Atualizado", comment.getContent());
         assertEquals("Atualizado", response.content());
@@ -167,7 +167,7 @@ class CommentServiceTest {
         Comment comment = buildComment(commentId, "Comentario", owner, work);
         when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
-        assertThrows(AccessDeniedException.class, () -> commentService.update(commentId, other.getId(), "Atualizado"));
+        assertThrows(AccessDeniedException.class, () -> commentService.update(commentId, other, "Atualizado"));
 
         verify(commentRepository, never()).save(any());
     }
@@ -177,7 +177,7 @@ class CommentServiceTest {
         UUID commentId = UUID.randomUUID();
         when(commentRepository.findById(commentId)).thenReturn(Optional.empty());
 
-        assertThrows(CommentNotFoundException.class, () -> commentService.update(commentId, UUID.randomUUID(), "Atualizado"));
+        assertThrows(CommentNotFoundException.class, () -> commentService.update(commentId, buildUser(UUID.randomUUID(), Role.ALUNO), "Atualizado"));
     }
 
     @Test
@@ -190,7 +190,7 @@ class CommentServiceTest {
 
         commentService.delete(commentId, owner);
 
-        verify(commentRepository).deleteById(commentId);
+        verify(commentRepository).delete(comment);
     }
 
     @Test
@@ -204,7 +204,7 @@ class CommentServiceTest {
 
         commentService.delete(commentId, admin);
 
-        verify(commentRepository).deleteById(commentId);
+        verify(commentRepository).delete(comment);
     }
 
     @Test

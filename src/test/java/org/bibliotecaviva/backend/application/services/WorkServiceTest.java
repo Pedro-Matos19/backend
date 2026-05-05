@@ -7,17 +7,16 @@ import org.bibliotecaviva.backend.application.dtos.response.WorkSummaryResponseD
 import org.bibliotecaviva.backend.application.dtos.response.textual.ArticleResponseDTO;
 import org.bibliotecaviva.backend.application.mappers.WorkMapper;
 import org.bibliotecaviva.backend.domain.entities.User;
-import org.bibliotecaviva.backend.domain.entities.WorkSummary;
+import org.bibliotecaviva.backend.domain.entities.projections.WorkSummary;
 import org.bibliotecaviva.backend.domain.entities.textual.Article;
 import org.bibliotecaviva.backend.domain.enums.Role;
 import org.bibliotecaviva.backend.domain.enums.Status;
 import org.bibliotecaviva.backend.domain.enums.WorkTypes;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
-import org.bibliotecaviva.backend.domain.exceptions.WorkAlreadyExistsException;
 import org.bibliotecaviva.backend.domain.exceptions.WorkNotFoundException;
-import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
-import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
+import org.bibliotecaviva.backend.persistence.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -124,9 +123,8 @@ class WorkServiceTest {
         Article saved = buildArticle(UUID.randomUUID(), author, request.title());
         WorkResponse expected = buildArticleResponse(saved.getId(), request.title(), 0L, 0L);
 
-        when(userRepository.findByEmail(request.author())).thenReturn(Optional.of(author));
+        when(userRepository.findByEmail(request.authorEmail())).thenReturn(Optional.of(author));
         when(workMapper.toEntity(request)).thenReturn(mapped);
-        when(workRepository.existsWorkByAuthorAndTitle(author, request.title())).thenReturn(false);
         when(workRepository.save(mapped)).thenReturn(saved);
         when(workMapper.toDTO(saved, 0L, 0L)).thenReturn(expected);
 
@@ -141,48 +139,28 @@ class WorkServiceTest {
     @Test
     void createShouldFailWhenAuthorDoesNotExist() {
         ArticleRequestDTO request = buildArticleRequest("Obra", "naoexiste@teste.com");
-        when(userRepository.findByEmail(request.author())).thenReturn(Optional.empty());
+        Article mapped = buildArticle(null, null, request.title());
+        when(workMapper.toEntity(request)).thenReturn(mapped);
+        when(userRepository.findByEmail(request.authorEmail())).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> workService.create(request));
 
-        verify(workMapper, never()).toEntity(request);
         verify(workRepository, never()).save(any());
     }
 
     @Test
-    void createShouldFailWhenAuthorAlreadyHasWorkWithSameTitle() {
-        User author = buildUser(UUID.randomUUID(), "autor@teste.com");
-        ArticleRequestDTO request = buildArticleRequest("Obra", author.getEmail());
-        Article mapped = buildArticle(null, null, request.title());
-        when(userRepository.findByEmail(request.author())).thenReturn(Optional.of(author));
-        when(workMapper.toEntity(request)).thenReturn(mapped);
-        when(workRepository.existsWorkByAuthorAndTitle(author, request.title())).thenReturn(true);
-
-        assertThrows(WorkAlreadyExistsException.class, () -> workService.create(request));
-
-        verify(workRepository, never()).save(any());
-    }
-
-    @Test
-    void updateShouldPatchExistingWorkWithoutChangingAuthorWhenAuthorIsBlank() {
+    void updateShouldFailWhenAuthorEmailIsBlankAndNoUserMatches() {
         UUID id = UUID.randomUUID();
         User author = buildUser(UUID.randomUUID(), "autor@teste.com");
         Article work = buildArticle(id, author, "Obra antiga");
         ArticleRequestDTO request = buildArticleRequest("Obra atualizada", " ");
-        WorkResponse expected = buildArticleResponse(id, request.title(), 5L, 1L);
 
         when(workRepository.findById(id)).thenReturn(Optional.of(work));
-        when(workRepository.save(work)).thenReturn(work);
-        when(workRepository.getLikeCount(id)).thenReturn(5L);
-        when(commentRepository.countByWork_Id(id)).thenReturn(1L);
-        when(workMapper.toDTO(work, 5L, 1L)).thenReturn(expected);
+        when(userRepository.findByEmail(request.authorEmail())).thenReturn(Optional.empty());
 
-        WorkResponse response = workService.update(id, request);
-
-        assertSame(expected, response);
-        assertSame(author, work.getAuthor());
+        assertThrows(UserNotFoundException.class, () -> workService.update(id, request));
         verify(workMapper).partialUpdate(request, work);
-        verify(userRepository, never()).findByEmail(anyString());
+        verify(workRepository, never()).save(any());
     }
 
     @Test
@@ -226,7 +204,7 @@ class WorkServiceTest {
         Article work = buildArticle(id, author, "Obra");
         ArticleRequestDTO request = buildArticleRequest("Obra", "naoexiste@teste.com");
         when(workRepository.findById(id)).thenReturn(Optional.of(work));
-        when(userRepository.findByEmail(request.author())).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(request.authorEmail())).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> workService.update(id, request));
 
@@ -292,9 +270,11 @@ class WorkServiceTest {
         return new ArticleRequestDTO(
                 title,
                 authorEmail,
+                null,
                 LocalDateTime.now().minusDays(1),
                 "Descricao valida para teste",
-                "Conteudo"
+                "Conteudo",
+                "Turma A"
         );
     }
 
@@ -332,7 +312,8 @@ class WorkServiceTest {
                 "Conteudo",
                 0L,
                 likes,
-                comments
+                comments,
+                "Turma A"
         );
     }
 
@@ -347,6 +328,7 @@ class WorkServiceTest {
                 0L,
                 1L,
                 1L,
+                null,
                 null,
                 null
         );

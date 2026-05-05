@@ -4,14 +4,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import org.bibliotecaviva.backend.application.services.JwtService;
+import org.bibliotecaviva.backend.domain.entities.BookClub;
+import org.bibliotecaviva.backend.domain.entities.BookClubReview;
 import org.bibliotecaviva.backend.domain.entities.Comment;
 import org.bibliotecaviva.backend.domain.entities.User;
 import org.bibliotecaviva.backend.domain.entities.textual.Article;
 import org.bibliotecaviva.backend.domain.enums.Role;
 import org.bibliotecaviva.backend.domain.enums.Status;
-import org.bibliotecaviva.backend.persistance.repository.CommentRepository;
-import org.bibliotecaviva.backend.persistance.repository.UserRepository;
-import org.bibliotecaviva.backend.persistance.repository.WorkRepository;
+import org.bibliotecaviva.backend.persistence.repository.BookClubRepository;
+import org.bibliotecaviva.backend.persistence.repository.BookClubReviewRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
+import org.bibliotecaviva.backend.persistence.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -21,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -48,6 +53,12 @@ abstract class IntegrationTestSupport {
 
     @Autowired
     protected CommentRepository commentRepository;
+
+    @Autowired
+    protected BookClubRepository bookClubRepository;
+
+    @Autowired
+    protected BookClubReviewRepository bookClubReviewRepository;
 
     @Autowired
     protected PasswordEncoder passwordEncoder;
@@ -111,6 +122,31 @@ abstract class IntegrationTestSupport {
         return commentRepository.saveAndFlush(comment);
     }
 
+    protected BookClub createBookClubInDatabase(User organizer, LocalDateTime date) {
+        BookClub bookClub = BookClub.builder()
+                .bookName(uniqueTitle("Clube"))
+                .bookSynopses("Sinopse valida para o clube do livro de teste")
+                .bookAuthor("Autor de teste")
+                .date(date)
+                .location("Biblioteca Municipal")
+                .bookCoverUrl("https://example.com/capa.jpg")
+                .organizer(organizer)
+                .participants(new HashSet<>())
+                .build();
+        return bookClubRepository.saveAndFlush(bookClub);
+    }
+
+    protected BookClubReview createBookClubReviewInDatabase(User user, BookClub bookClub, String content, BigDecimal rating) {
+        BookClubReview review = BookClubReview.builder()
+                .content(content)
+                .rating(rating)
+                .createdAt(LocalDateTime.now())
+                .user(user)
+                .bookClub(bookClub)
+                .build();
+        return bookClubReviewRepository.saveAndFlush(review);
+    }
+
     protected String bearer(User user) {
         return "Bearer " + jwtService.generateToken(user);
     }
@@ -134,9 +170,10 @@ abstract class IntegrationTestSupport {
     protected Map<String, Object> baseWorkPayload(String title, String authorEmail) {
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("title", title);
-        payload.put("author", authorEmail);
+        payload.put("authorEmail", authorEmail);
         payload.put("publicationDate", LocalDateTime.now().minusDays(1).toString());
         payload.put("description", "Descricao valida para teste");
+        payload.put("studentClass", "Turma A");
         return payload;
     }
 
