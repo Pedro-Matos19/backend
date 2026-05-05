@@ -4,7 +4,9 @@ import org.bibliotecaviva.backend.domain.entities.BookClub;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -26,4 +28,12 @@ public interface BookClubRepository extends JpaRepository<BookClub, UUID> {
     boolean existsBookClubByDateBetween(LocalDateTime dateAfter, LocalDateTime dateBefore);
 
     boolean existsBookClubByDateBetweenAndIdNot(LocalDateTime dateAfter, LocalDateTime dateBefore, UUID id);
+
+    @Modifying
+    @Query(value = "DELETE FROM book_club_participants WHERE users_id = :userId", nativeQuery = true)
+    void deleteParticipantLinksByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query("UPDATE BookClub b SET b.organizer = null WHERE b.organizer.id = :userId")
+    void clearOrganizerByUserId(@Param("userId") UUID userId);
 }

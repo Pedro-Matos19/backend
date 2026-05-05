@@ -114,4 +114,8 @@ public interface WorkRepository extends JpaRepository<Work, UUID> {
     boolean existsWorkByAuthorAndTitle(User author, String title);
 
     boolean existsWorkByAuthorNameAndTitle(String authorName, String title);
+
+    @Modifying
+    @Query("UPDATE Work w SET w.authorName = :authorName, w.author = null WHERE w.author.id = :userId")
+    void detachAuthorByUserId(@Param("userId") UUID userId, @Param("authorName") String authorName);
 }

@@ -10,7 +10,11 @@ import org.bibliotecaviva.backend.domain.exceptions.AccountAlreadyActiveExceptio
 import org.bibliotecaviva.backend.domain.exceptions.AccountAlreadyBlockedException;
 import org.bibliotecaviva.backend.domain.exceptions.AccountNotPendingException;
 import org.bibliotecaviva.backend.domain.exceptions.UserNotFoundException;
+import org.bibliotecaviva.backend.persistence.repository.BookClubRepository;
+import org.bibliotecaviva.backend.persistence.repository.BookClubReviewRepository;
+import org.bibliotecaviva.backend.persistence.repository.CommentRepository;
 import org.bibliotecaviva.backend.persistence.repository.UserRepository;
+import org.bibliotecaviva.backend.persistence.repository.WorkRepository;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +28,10 @@ public class UserManagementService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final WorkRepository workRepository;
+    private final CommentRepository commentRepository;
+    private final BookClubRepository bookClubRepository;
+    private final BookClubReviewRepository bookClubReviewRepository;
 
     /**
      * @param id Acepts any status, since blocked and rejected can change to approved(active status)
@@ -63,6 +71,22 @@ public class UserManagementService {
         }
         user.setAccountStatus(Status.BLOCKED);
         userRepository.save(user);
+    }
+
+    @Transactional
+    public void deleteUser(UUID id) {
+        var user = getUser(id);
+
+        commentRepository.deleteLikesFromCommentsByUserId(id);
+        commentRepository.deleteAllByUserId(id);
+        bookClubReviewRepository.deleteAllByUserId(id);
+        userRepository.deleteCommentLikesByUserId(id);
+        userRepository.deleteWorkLikesByUserId(id);
+        bookClubRepository.deleteParticipantLinksByUserId(id);
+        bookClubRepository.clearOrganizerByUserId(id);
+        workRepository.detachAuthorByUserId(id, user.getName());
+
+        userRepository.delete(user);
     }
 
     //trocar por dto

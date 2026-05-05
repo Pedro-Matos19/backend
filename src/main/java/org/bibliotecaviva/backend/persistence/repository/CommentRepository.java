@@ -36,6 +36,19 @@ public interface CommentRepository extends JpaRepository<Comment, UUID> {
     @Query(value = "DELETE FROM comment_likes WHERE user_id = :userId AND comment_id = :commentId", nativeQuery = true)
     void unlikeComment(@Param("userId") UUID userId, @Param("commentId") UUID commentId);
 
+    @Modifying
+    @Query(value = """
+            DELETE FROM comment_likes
+            WHERE comment_id IN (
+                SELECT id FROM comments WHERE user_id = :userId
+            )
+            """, nativeQuery = true)
+    void deleteLikesFromCommentsByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query(value = "DELETE FROM comments WHERE user_id = :userId", nativeQuery = true)
+    void deleteAllByUserId(@Param("userId") UUID userId);
+
     @Query(value = "SELECT COUNT(*) FROM comment_likes WHERE comment_id = :commentId", nativeQuery = true)
     long getLikeCount(@Param("commentId") UUID commentId);
 

@@ -114,7 +114,10 @@ public class BookClubService {
     }
 
     private static void verifyOwnership(User user, BookClub club) {
-        if (!club.getOrganizer().getId().equals(user.getId()) && user.getRole() != Role.ADMIN) {
+        if (user.getRole() == Role.ADMIN) {
+            return;
+        }
+        if (club.getOrganizer() == null || !club.getOrganizer().getId().equals(user.getId())) {
             throw new ForbiddenException("Forbidden");
         }
     }

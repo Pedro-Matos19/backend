@@ -35,6 +35,14 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     @Query(value = "DELETE FROM likes WHERE user_id = :userId AND work_id = :workId", nativeQuery = true)
     void unlikeWork(@Param("userId") UUID userId, @Param("workId") UUID workId);
 
+    @Modifying
+    @Query(value = "DELETE FROM likes WHERE user_id = :userId", nativeQuery = true)
+    void deleteWorkLikesByUserId(@Param("userId") UUID userId);
+
+    @Modifying
+    @Query(value = "DELETE FROM comment_likes WHERE user_id = :userId", nativeQuery = true)
+    void deleteCommentLikesByUserId(@Param("userId") UUID userId);
+
     Page<User> findAllByAccountStatus(Status accountStatus, Pageable pageable);
 
     boolean existsByEmail(String email);
