@@ -87,7 +87,7 @@ public class UsersImportService {
                         .email(email)
                         .password(passwordEncoder.encode(password))
                         .role(Role.ALUNO)
-                        .accountStatus(Status.PENDING)
+                        .accountStatus(Status.ACTIVE)
                         .likedWorks(new HashSet<>())
                         .build();
 
