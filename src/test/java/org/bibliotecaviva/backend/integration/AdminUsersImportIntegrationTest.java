@@ -125,7 +125,7 @@ class AdminUsersImportIntegrationTest extends IntegrationTestSupport {
 
         assertEquals(name, importedUser.getName());
         assertEquals(Role.ALUNO, importedUser.getRole());
-        assertEquals(Status.PENDING, importedUser.getAccountStatus());
+        assertEquals(Status.ACTIVE, importedUser.getAccountStatus());
         assertTrue(passwordEncoder.matches(rawPassword, importedUser.getPassword()));
     }
 

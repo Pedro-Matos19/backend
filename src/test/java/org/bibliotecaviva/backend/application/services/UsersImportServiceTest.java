@@ -174,7 +174,7 @@ class UsersImportServiceTest {
         assertEquals(email, user.getEmail());
         assertEquals(password, user.getPassword());
         assertEquals(Role.ALUNO, user.getRole());
-        assertEquals(Status.PENDING, user.getAccountStatus());
+        assertEquals(Status.ACTIVE, user.getAccountStatus());
         assertNotNull(user.getLikedWorks());
         assertTrue(user.getLikedWorks().isEmpty());
     }
